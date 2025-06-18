@@ -26,11 +26,12 @@
           <fieldset>
             <legend class="font-bold mb-2">🧠 Technology</legend>
             {% for t in ["AI","Cyber","Mobile","Gadgets","Startups"] %}
-              <label class="block">
-                <input type="checkbox" name="topics" value="{{ t }}"
-                       {% if t in preferences.topics %}checked{% endif %}>
-                {{ t }}
-              </label>
+<label class="block">
+  <input type="checkbox" name="topics" value="{{ t }}"
+         {% if t in preferences.get("topics", []) %}checked{% endif %} />
+  {{ t }}
+</label>
+
             {% endfor %}
           </fieldset>
 
@@ -40,7 +41,8 @@
             {% for t in ["Crypto","Fintech","StockMarket","RealEstate","Leadership"] %}
               <label class="block">
                 <input type="checkbox" name="topics" value="{{ t }}"
-                       {% if t in preferences.topics %}checked{% endif %}>
+                     {% if t in preferences.get("topics", []) %}checked{% endif %}
+>
                 {{ t }}
               </label>
             {% endfor %}
@@ -52,7 +54,8 @@
             {% for t in ["Football","Basketball","Tennis","Olympics","Running"] %}
               <label class="block">
                 <input type="checkbox" name="topics" value="{{ t }}"
-                       {% if t in preferences.topics %}checked{% endif %}>
+                       {% if t in preferences.get("topics", []) %}checked{% endif %}
+>
                 {{ t }}
               </label>
             {% endfor %}
@@ -64,7 +67,8 @@
             {% for t in ["Nutrition","MentalHealth","Fitness","Medicine","Wellness"] %}
               <label class="block">
                 <input type="checkbox" name="topics" value="{{ t }}"
-                       {% if t in preferences.topics %}checked{% endif %}>
+                       {% if t in preferences.get("topics", []) %}checked{% endif %}
+>
                 {{ t }}
               </label>
             {% endfor %}
@@ -76,7 +80,8 @@
             {% for t in ["Space","Climate","Physics","Biology","Chemistry"] %}
               <label class="block">
                 <input type="checkbox" name="topics" value="{{ t }}"
-                       {% if t in preferences.topics %}checked{% endif %}>
+                       {% if preferences.get("topics") and t in preferences.get("topics") %}checked{% endif %}
+>
                 {{ t }}
               </label>
             {% endfor %}
@@ -88,7 +93,8 @@
             {% for t in ["Movies","Music","TV","Celebs","Gaming"] %}
               <label class="block">
                 <input type="checkbox" name="topics" value="{{ t }}"
-                       {% if t in preferences.topics %}checked{% endif %}>
+                       {% if t in preferences.get('topics', []) %}checked{% endif %}
+>
                 {{ t }}
               </label>
             {% endfor %}
@@ -100,7 +106,8 @@
             {% for t in ["Elections","Policy","Diplomacy","Security","EconomyPolitics"] %}
               <label class="block">
                 <input type="checkbox" name="topics" value="{{ t }}"
-                       {% if t in preferences.topics %}checked{% endif %}>
+                       {% if t in preferences.get('topics', []) %}checked{% endif %}
+>
                 {{ t }}
               </label>
             {% endfor %}
@@ -112,7 +119,8 @@
             {% for t in ["Travel","Food","Fashion","Home","Culture"] %}
               <label class="block">
                 <input type="checkbox" name="topics" value="{{ t }}"
-                       {% if t in preferences.topics %}checked{% endif %}>
+                      {% if t in preferences.get('topics', []) %}checked{% endif %}
+>
                 {{ t }}
               </label>
             {% endfor %}
