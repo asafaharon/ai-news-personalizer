@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personalized News Dashboard</title>
+
+  <!-- Tailwind CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+
+  <!-- Respect system dark-mode before first paint -->
+  <script>
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
+
+  <!-- Fixed Navbar -->
+  <header class="bg-blue-700 dark:bg-blue-800 text-white py-4 shadow fixed top-0 inset-x-0 z-50">
+    <div class="max-w-4xl mx-auto px-4 flex items-center justify-between">
+      <h1 class="text-xl md:text-2xl font-semibold">👋 Hello, {{ user.full_name }}!</h1>
+      <nav class="flex gap-3 text-sm">
+        <a href="/profile/edit" class="hover:underline">Edit Profile</a>
+        <a href="/profile"      class="hover:underline">Edit Preferences</a>
+        <a href="/favorites"    class="hover:underline">My&nbsp;Favorites</a>
+        <a href="/logout"       class="text-red-300 hover:text-red-500">Log&nbsp;Out</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Spacer below Navbar -->
+  <div class="pt-20"></div>
+
+  <!-- Preferences card -->
+  <section class="max-w-4xl mx-auto mt-2 px-4">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
+      <h2 class="text-lg font-bold text-blue-700 dark:text-blue-400 mb-2">Current Preferences</h2>
+      <p class="text-sm">
+        Categories:
+        {% if preferences.categories %}
+          {{ preferences.categories | join(", ") }}
+        {% else %} – {% endif %}<br>
+        Topics:
+        {% if preferences.topics %}
+          {{ preferences.topics | join(", ") }}
+        {% else %} – {% endif %}
+      </p>
+    </div>
+  </section>
+
+  <!-- ███ Skeleton loading while JS mounts -->
+  <div id="loadingSkeleton" class="max-w-4xl mx-auto px-4 animate-pulse space-y-4">
+    {% for _ in range(3) %}
+      <div class="bg-gray-300 dark:bg-gray-700 h-32 rounded"></div>
+    {% endfor %}
+  </div>
+
+  <!-- Articles list -->
+  <main id="articleContainer" class="max-w-4xl mx-auto p-4 hidden">
+    {% if summaries %}
+      {% for item in summaries %}
+        <article class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700 mb-6">
+          <h2 class="text-xl font-bold text-blue-700 dark:text-blue-400 mb-1">{{ item.title }}</h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+            {{ item.published[:10] }} &nbsp;|&nbsp; {{ item.source }}
+          </p>
+          <p class="leading-relaxed mb-2">{{ item.summary }}</p>
+
+          <div class="flex items-center gap-3">
+            <a href="{{ item.url }}" target="_blank" class="text-blue-600 hover:underline">
+              Read full article
+            </a>
+
+            <!-- Add to favorites -->
+            <form method="post" action="/favorites/add">
+              <input type="hidden" name="url"       value="{{ item.url }}">
+              <input type="hidden" name="title"     value="{{ item.title }}">
+              <input type="hidden" name="source"    value="{{ item.source }}">
+              <input type="hidden" name="published" value="{{ item.published }}">
+              <button type="submit" class="text-yellow-500 hover:text-yellow-600 text-xl" title="Save to Favorites">
+                ★
+              </button>
+            </form>
+          </div>
+        </article>
+      {% endfor %}
+    {% else %}
+      <p class="text-center text-gray-500 dark:text-gray-400">
+        No articles found. <a href="/profile" class="text-blue-600 underline">Update your preferences</a>.
+      </p>
+    {% endif %}
+  </main>
+
+  <!-- Hide skeleton once DOM is ready -->
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('loadingSkeleton').style.display = 'none';
+      document.getElementById('articleContainer').classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Personal News Preferences</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center font-sans">
+  <div class="bg-white shadow-md rounded-lg p-8 w-full max-w-3xl">
+    <h1 class="text-2xl font-bold mb-8 text-center">Choose Your Topics</h1>
+
+    <!-- Preferences form -->
+    <form id="prefsForm" action="/profile" method="post" class="space-y-8">
+
+      <!-- ░░░ Topics ░░░ -->
+      <div>
+        <h2 class="text-lg font-semibold mb-4 text-blue-700">
+          Select at least one topic <span class="text-red-500">*</span>
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          {# --- Technology --- #}
+          <fieldset>
+            <legend class="font-bold mb-2">🧠 Technology</legend>
+            {% for t in ["AI","Cyber","Mobile","Gadgets","Startups"] %}
+              <label class="block">
+                <input type="checkbox" name="topics" value="{{ t }}"
+                       {% if t in preferences.topics %}checked{% endif %}>
+                {{ t }}
+              </label>
+            {% endfor %}
+          </fieldset>
+
+          {# --- Business --- #}
+          <fieldset>
+            <legend class="font-bold mb-2">💼 Business</legend>
+            {% for t in ["Crypto","Fintech","StockMarket","RealEstate","Leadership"] %}
+              <label class="block">
+                <input type="checkbox" name="topics" value="{{ t }}"
+                       {% if t in preferences.topics %}checked{% endif %}>
+                {{ t }}
+              </label>
+            {% endfor %}
+          </fieldset>
+
+          {# --- Sports --- #}
+          <fieldset>
+            <legend class="font-bold mb-2">🏅 Sports</legend>
+            {% for t in ["Football","Basketball","Tennis","Olympics","Running"] %}
+              <label class="block">
+                <input type="checkbox" name="topics" value="{{ t }}"
+                       {% if t in preferences.topics %}checked{% endif %}>
+                {{ t }}
+              </label>
+            {% endfor %}
+          </fieldset>
+
+          {# --- Health --- #}
+          <fieldset>
+            <legend class="font-bold mb-2">🧬 Health</legend>
+            {% for t in ["Nutrition","MentalHealth","Fitness","Medicine","Wellness"] %}
+              <label class="block">
+                <input type="checkbox" name="topics" value="{{ t }}"
+                       {% if t in preferences.topics %}checked{% endif %}>
+                {{ t }}
+              </label>
+            {% endfor %}
+          </fieldset>
+
+          {# --- Science --- #}
+          <fieldset>
+            <legend class="font-bold mb-2">🔬 Science</legend>
+            {% for t in ["Space","Climate","Physics","Biology","Chemistry"] %}
+              <label class="block">
+                <input type="checkbox" name="topics" value="{{ t }}"
+                       {% if t in preferences.topics %}checked{% endif %}>
+                {{ t }}
+              </label>
+            {% endfor %}
+          </fieldset>
+
+          {# --- Entertainment --- #}
+          <fieldset>
+            <legend class="font-bold mb-2">🎬 Entertainment</legend>
+            {% for t in ["Movies","Music","TV","Celebs","Gaming"] %}
+              <label class="block">
+                <input type="checkbox" name="topics" value="{{ t }}"
+                       {% if t in preferences.topics %}checked{% endif %}>
+                {{ t }}
+              </label>
+            {% endfor %}
+          </fieldset>
+
+          {# --- Politics --- #}
+          <fieldset>
+            <legend class="font-bold mb-2">🏛️ Politics</legend>
+            {% for t in ["Elections","Policy","Diplomacy","Security","EconomyPolitics"] %}
+              <label class="block">
+                <input type="checkbox" name="topics" value="{{ t }}"
+                       {% if t in preferences.topics %}checked{% endif %}>
+                {{ t }}
+              </label>
+            {% endfor %}
+          </fieldset>
+
+          {# --- Lifestyle --- #}
+          <fieldset>
+            <legend class="font-bold mb-2">🌿 Lifestyle</legend>
+            {% for t in ["Travel","Food","Fashion","Home","Culture"] %}
+              <label class="block">
+                <input type="checkbox" name="topics" value="{{ t }}"
+                       {% if t in preferences.topics %}checked{% endif %}>
+                {{ t }}
+              </label>
+            {% endfor %}
+          </fieldset>
+        </div>
+      </div>
+
+      <!-- ░░░ Article count ░░░ -->
+      <div class="sm:w-1/2">
+        <label for="article_count" class="block mb-1 font-semibold text-gray-700">Number of Articles</label>
+        <input type="number" id="article_count" name="article_count"
+               value="{{ article_count or 10 }}" min="1" max="20"
+               class="w-full border border-gray-300 p-2 rounded" required />
+      </div>
+
+      <div class="text-center">
+        <button type="submit"
+                class="bg-blue-600 text-white px-8 py-2 rounded hover:bg-blue-700 transition">
+          Save Preferences
+        </button>
+      </div>
+    </form>
+
+    <div class="text-center mt-4">
+      <a href="/dashboard" class="text-blue-600 underline hover:text-blue-800">
+        ← Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- Client-side validation: ensure at least one topic -->
+  <script>
+    document.getElementById('prefsForm').addEventListener('submit', (e) => {
+      const anyChecked = [...document.querySelectorAll('input[name="topics"]')]
+                          .some(cb => cb.checked);
+      if (!anyChecked) {
+        e.preventDefault();
+        alert('Please select at least one topic before continuing.');
+      }
+    });
+  </script>
+</body>
+</html>

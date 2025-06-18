@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI News Personalizer</title>
+
+  <!-- Tailwind CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+
+  <!-- Dark-mode before paint -->
+  <script>
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches)
+      document.documentElement.classList.add('dark');
+  </script>
+
+  <!-- Subtle animated gradient -->
+  <style>
+    .hero-bg {
+      background: linear-gradient(135deg,#65C7F7 0%,#0052D4 100%);
+      animation: gradientShift 6s ease-in-out infinite alternate;
+    }
+    @keyframes gradientShift {
+      to { background-position: 200% 0; }
+    }
+    .glow { text-shadow: 0 0 10px rgba(255,255,255,.6); }
+  </style>
+</head>
+
+<body class="hero-bg bg-fixed bg-cover bg-center min-h-screen flex items-center justify-center text-center text-white">
+
+  <!-- Center card -->
+  <div class="backdrop-blur-sm/30 bg-white/10 dark:bg-gray-900/30 p-8 rounded-3xl shadow-2xl max-w-lg w-full">
+    <h1 class="text-4xl md:text-5xl font-extrabold mb-4 glow">
+      AI&nbsp;News Personalizer
+    </h1>
+
+    <p class="text-lg md:text-xl mb-8 tracking-wide leading-relaxed">
+      Get AI-summarized, personalized news<br/>in one click—tailored to your interests.
+    </p>
+
+    <div class="flex flex-col gap-4">
+      <a href="/login"
+         class="rounded-full bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-semibold py-3 transition shadow-lg hover:scale-105">
+        🚀 Log&nbsp;In
+      </a>
+      <a href="/register"
+         class="rounded-full border border-white/70 hover:border-white py-3 font-semibold backdrop-blur-sm transition hover:scale-105">
+        ✨ Sign&nbsp;Up&nbsp;Free
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer credit -->
+  <footer class="absolute bottom-4 text-sm text-white/80 dark:text-white/50 w-full text-center">
+    Built with ❤️ by <a href="https://github.com/asafaharon" target="_blank" class="underline hover:text-yellow-300 font-semibold">Asaf Aharon</a>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Update Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+  <div class="bg-white shadow-md rounded-lg p-8 w-full max-w-md">
+    <h1 class="text-2xl font-bold mb-6 text-center">Update Your Details</h1>
+
+    {% if error %}
+      <p class="text-red-600 text-center mb-4">{{ error }}</p>
+    {% endif %}
+
+    <form method="post" action="/profile/edit" class="space-y-5">
+      <div>
+        <label class="block text-gray-700 font-semibold mb-1">Full Name</label>
+        <input type="text" name="full_name" value="{{ user.full_name }}" required
+               class="w-full border border-gray-300 p-2 rounded" />
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-semibold mb-1">Current Password</label>
+        <input type="password" name="current_password" required
+               class="w-full border border-gray-300 p-2 rounded" />
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-semibold mb-1">New Password</label>
+        <input type="password" name="new_password" required
+               class="w-full border border-gray-300 p-2 rounded" />
+      </div>
+
+      <div class="text-center">
+        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+          Save Changes
+        </button>
+      </div>
+    </form>
+
+    <div class="text-center mt-4">
+      <a href="/dashboard" class="text-blue-600 hover:underline">← Back to Dashboard</a>
+    </div>
+  </div>
+</body>
+</html>

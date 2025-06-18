@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Loading Your News…</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+
+  <!-- Auto-redirect to dashboard after 4 seconds -->
+  <script>
+    setTimeout(() => {
+      window.location.href = "/dashboard";
+    }, 4000);
+  </script>
+</head>
+
+<body class="bg-gradient-to-br from-blue-200 to-blue-500 min-h-screen flex items-center justify-center px-4">
+  <div class="text-center text-white max-w-xl">
+    <p class="text-3xl font-bold mb-4 animate-pulse">
+      Loading personalized news…
+    </p>
+
+    <p class="text-lg mb-6">
+      We’re matching your preferences and fetching the best articles 🎯
+    </p>
+
+    <div class="grid gap-3 text-sm text-white/90">
+      <div class="bg-white/10 backdrop-blur-sm p-3 rounded-xl shadow-md">
+        🛠️ <span class="font-semibold">Update your preferences</span><br />
+        Choose topics, and how many articles you want.
+      </div>
+      <div class="bg-white/10 backdrop-blur-sm p-3 rounded-xl shadow-md">
+        ⭐ <span class="font-semibold">Save your favorite articles</span><br />
+        Mark any article you like to keep it for later reading.
+      </div>
+      <div class="bg-white/10 backdrop-blur-sm p-3 rounded-xl shadow-md">
+        🔐 <span class="font-semibold">Change your password</span><br />
+        Manage your account securely anytime from your profile.
+      </div>
+    </div>
+
+    <div class="mt-8">
+      <svg class="animate-spin h-10 w-10 mx-auto text-white"
+           xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10"
+                stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor"
+              d="M4 12a8 8 0 018-8v8H4z"></path>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>
