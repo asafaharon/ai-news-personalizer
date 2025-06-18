@@ -7,11 +7,21 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
 
   <!-- Auto-redirect to dashboard after 4 seconds -->
-  <script>
-    setTimeout(() => {
-      window.location.href = "/dashboard";
-    }, 4000);
-  </script>
+<script>
+  setTimeout(() => {
+    fetch("/dashboard", { method: "GET" })
+      .then(res => {
+        if (res.ok) {
+          window.location.href = "/dashboard";
+        } else {
+          alert("היתה שגיאה בעת טעינת החדשות. אנא נסה שוב מאוחר יותר.");
+        }
+      })
+      .catch(() => {
+        alert("הייתה תקלה בחיבור לשרת.");
+      });
+  }, 4000);
+</script>
 </head>
 
 <body class="bg-gradient-to-br from-blue-200 to-blue-500 min-h-screen flex items-center justify-center px-4">
