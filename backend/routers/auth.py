@@ -67,32 +67,47 @@ async def login_submit(
 @router.get("/register", response_class=HTMLResponse)
 async def register_form(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
-
 @router.post("/register")
 async def register_submit(
     request: Request,
-    full_name: str = Form(...),
+    name: str = Form(...),
     email: str = Form(...),
     password: str = Form(...),
 ):
     email = email.strip().lower()
-    user_exists = await db["users"].find_one({"email": email})
-    if user_exists:
+    name = name.strip()
+
+    # בדיקת תקינות בסיסית
+    if not name or not email or not password:
         return templates.TemplateResponse("register.html", {
             "request": request,
-            "error": "אימייל זה כבר רשום"
+            "error": "נא למלא את כל השדות"
+        })
+
+    existing_user = await db["users"].find_one({"email": email})
+    if existing_user:
+        return templates.TemplateResponse("register.html", {
+            "request": request,
+            "error": "משתמש עם האימייל הזה כבר קיים"
         })
 
     hashed_password = pwd_context.hash(password)
+
     new_user = {
-        "full_name": full_name,
+        "name": name,
         "email": email,
         "password": hashed_password,
-        "preferences": {"categories": [], "topics": [], "num_articles": 10}
+        "preferences": {},
+        "created_at": datetime.utcnow(),
     }
-    result = await db["users"].insert_one(new_user)
 
-    token = create_access_token(data={"sub": str(result.inserted_id)}, expires_delta=timedelta(hours=1))
+    await db["users"].insert_one(new_user)
+
+    # התחברות אוטומטית לאחר הרשמה
+    token = create_access_token(
+        data={"sub": str(new_user["_id"])},
+        expires_delta=timedelta(hours=1)
+    )
     response = RedirectResponse(url="/loading", status_code=302)
     response.set_cookie(
         key="access_token",
@@ -102,6 +117,7 @@ async def register_submit(
         secure=False
     )
     return response
+
 
 
 @router.get("/logout")
