@@ -104,50 +104,53 @@ async def save_preferences(
 
     return RedirectResponse("/loading", status_code=302)
 # backend/routers/profile.py
-
 @router.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request, user=Depends(get_current_user)):
-    # שלב 1: שליפת המשתמש
+    print("🔍 dashboard(): התחלנו")
+
     user_doc = await db["users"].find_one({"_id": user["_id"]})
     if not user_doc:
+        print("❌ לא נמצא משתמש")
         return RedirectResponse("/login")
 
-    # שלב 2: בדיקת העדפות
+    print("👤 user_doc:", user_doc)
+
     prefs = user_doc.get("preferences", {})
     if not prefs or not prefs.get("topics"):
+        print("⚠️ אין העדפות שמורות")
         return RedirectResponse("/profile")
 
-    # שלב 3: הכנת פרמטרים ל-News API
     query = " OR ".join(prefs["topics"])
     page_size = int(prefs.get("article_count", 10))
 
     if not NEWS_API_KEY:
-        raise HTTPException(500, detail="Missing NEWS_API_KEY in environment")
+        print("❌ חסר NEWS_API_KEY")
+        raise HTTPException(500, detail="Missing NEWS_API_KEY")
 
     params = {
         "q": query,
         "apiKey": NEWS_API_KEY,
         "sortBy": "publishedAt",
-        "language": "en",  # ← קבוע
+        "language": "en",
         "pageSize": page_size,
     }
 
-    # שלב 4: שליחת בקשה ל-News API
     try:
         resp = requests.get(NEWS_API_URL, params=params, timeout=10)
         resp.raise_for_status()
         data = resp.json()
     except Exception as e:
+        print("❌ שגיאה ב-NewsAPI:", e)
         raise HTTPException(502, detail=f"News API error: {str(e)}")
 
-    # שלב 5: עיבוד וסיכום הכתבות
     articles = []
     for a in data.get("articles", []):
         full_text = a.get("content") or a.get("description") or a.get("title", "")
         try:
             summary = get_openai_summary(full_text)
-        except Exception:
-            summary = "תקציר לא זמין כעת"
+        except Exception as e:
+            print("❌ שגיאה בתקציר עם OpenAI:", e)
+            summary = "תקציר לא זמין"
 
         articles.append({
             "title": a.get("title", "No Title"),
@@ -157,7 +160,7 @@ async def dashboard(request: Request, user=Depends(get_current_user)):
             "summary": summary,
         })
 
-    # שלב 6: תצוגת תבנית
+    print("✅ מציגים תבנית dashboard")
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
         "user": user_doc,
