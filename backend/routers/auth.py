@@ -24,6 +24,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 async def login_form(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 @router.post("/login")
+@router.post("/login")
 async def login_submit(
     request: Request,
     email: str = Form(...),
@@ -32,19 +33,25 @@ async def login_submit(
     email = email.strip().lower()
     user_record = await db["users"].find_one({"email": email})
 
-    if not user_record:
+    # בדיקה האם המשתמש קיים והאם יש לו שדה סיסמה
+    if not user_record or "password" not in user_record:
         return templates.TemplateResponse("login.html", {
             "request": request,
-            "error": "אימייל לא נמצא במערכת"
+            "error": "אימייל או סיסמה שגויים"
         })
 
+    # בדיקת סיסמה
     if not pwd_context.verify(password, user_record["password"]):
         return templates.TemplateResponse("login.html", {
             "request": request,
-            "error": "סיסמה שגויה"
+            "error": "אימייל או סיסמה שגויים"
         })
 
-    token = create_access_token(data={"sub": str(user_record["_id"])}, expires_delta=timedelta(hours=1))
+    # יצירת טוקן והפניה ל-loading
+    token = create_access_token(
+        data={"sub": str(user_record["_id"])},
+        expires_delta=timedelta(hours=1)
+    )
     response = RedirectResponse(url="/loading", status_code=302)
     response.set_cookie(
         key="access_token",
@@ -54,7 +61,6 @@ async def login_submit(
         secure=False
     )
     return response
-
 
 
 
