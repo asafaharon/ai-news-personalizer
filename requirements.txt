@@ -9,6 +9,7 @@ python-jose~=3.5.0
 python-multipart>=0.0.5
 requests>=2.0.0
 jinja2>=3.0.0
+email-validator~=2.1.1
 
 
 jose~=1.0.0
