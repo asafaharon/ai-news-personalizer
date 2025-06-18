@@ -2,9 +2,6 @@ from typing import List
 from datetime import datetime
 import asyncio, os, httpx, re
 from fastapi import APIRouter, Depends, HTTPException, Query
-import redis.asyncio as aioredis
-import json
-from backend.core.config import REDIS_URL
 from backend.auth.security import get_current_user
 from backend.schemas.user import UserOut
 from backend.schemas.news import (
@@ -16,7 +13,6 @@ from backend.utils.openai_client import get_openai_summary
 
 router = APIRouter(prefix="/news", tags=["News"])
 http_client = httpx.AsyncClient(timeout=10.0)
-redis_client = aioredis.from_url(REDIS_URL, decode_responses=True)
 
 # --- סינון אם טקסט הוא באנגלית בלבד ---
 def _looks_english(text: str) -> bool:
@@ -45,22 +41,14 @@ def _parse_articles(raw: dict, interests: list[str]) -> List[NewsArticle]:
                 publishedAt=datetime.fromisoformat(a["publishedAt"].replace("Z", "+00:00")),
                 content=a.get("content"),
             )
-
             if _relevant_to_user(parsed, interests):
                 articles.append(parsed)
         return articles
     except Exception:
         raise HTTPException(500, "Failed to parse news data")
 
+# --- שליפת כתבות מה־API (ללא Cache) ---
 async def _fetch_from_newsapi(query: str, language: str = "en", page_size: int = 10):
-    cache_key = f"news:{language}:{query}:{page_size}"
-
-    # 🔎 בדיקת cache
-    cached = await redis_client.get(cache_key)
-    if cached:
-        return json.loads(cached)
-
-    # 📡 שליפה מ־API
     url = (
         f"https://newsapi.org/v2/everything?"
         f"qInTitle={query}&language={language}&pageSize={page_size}&sortBy=publishedAt&apiKey={NEWS_API_KEY}"
@@ -68,12 +56,9 @@ async def _fetch_from_newsapi(query: str, language: str = "en", page_size: int =
     resp = await http_client.get(url)
     if resp.status_code != 200:
         raise HTTPException(502, "News API error")
+    return resp.json()
 
-    data = resp.json()
-
-    # 💾 שמירה ל־Redis ל־10 דקות
-    await redis_clie
-
+# --- נקודת קצה לשליפת כתבות מותאמות אישית ---
 @router.get("/", response_model=FilteredNewsResult)
 async def fetch_news(
     topics: List[str] = Query(...),
@@ -83,12 +68,13 @@ async def fetch_news(
     if not NEWS_API_KEY:
         raise HTTPException(500, "Missing News API key")
 
-    language = current_user.get("preferred_language", "en")  # ✅ קבלת שפה מהמשתמש
+    language = current_user.get("preferred_language", "en")
     query = " OR ".join(topics)
     raw = await _fetch_from_newsapi(query, language, page_size)
     articles = _parse_articles(raw, topics)
     return FilteredNewsResult(total=len(articles), articles=articles)
 
+# --- נקודת קצה לסיכום AI של כתבות ---
 @router.get("/ai-summarized", response_model=SummarizedNewsResponse)
 async def ai_summarize_news(
     topics: List[str] = Query(...),
@@ -100,8 +86,6 @@ async def ai_summarize_news(
 
     raw = await _fetch_from_newsapi(query, language, page_size)
     articles = _parse_articles(raw, topics)
-
-    # ✅ לפי מספר שהמשתמש ביקש
     top_articles = articles[:page_size]
 
     async def summarize(article: NewsArticle):
@@ -114,4 +98,3 @@ async def ai_summarize_news(
 
     summaries = await asyncio.gather(*(summarize(a) for a in top_articles))
     return SummarizedNewsResponse(summaries=summaries)
-
