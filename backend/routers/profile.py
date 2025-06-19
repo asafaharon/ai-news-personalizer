@@ -49,7 +49,7 @@ def get_openai_summary(text: str, lang: str = "en") -> str:
         )
         return response.choices[0].message.content.strip()
     except Exception:
-        return "שגיאה בסיכום עם AI" if lang == "he" else "AI summary error"
+        return "Error in summary with AI" if lang == "he" else "AI summary error"
 
 
 # backend/routers/profile.py
@@ -193,7 +193,7 @@ async def update_profile(
         return templates.TemplateResponse("edit_profile.html", {
             "request": request,
             "user": user,
-            "error": "סיסמה נוכחית שגויה"
+            "error": "Current password is incorrect."
         })
 
     await db["users"].update_one(

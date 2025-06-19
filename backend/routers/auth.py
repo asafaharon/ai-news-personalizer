@@ -38,14 +38,14 @@ async def login_submit(
     if not user_record or "password" not in user_record:
         return templates.TemplateResponse("login.html", {
             "request": request,
-            "error": "אימייל או סיסמה שגויים"
+            "error": "Incorrect email or password"
         })
 
     # בדיקת סיסמה
     if not pwd_context.verify(password, user_record["password"]):
         return templates.TemplateResponse("login.html", {
             "request": request,
-            "error": "אימייל או סיסמה שגויים"
+            "error": "Incorrect email or password"
         })
 
     # יצירת טוקן והפניה ל-loading
@@ -82,14 +82,14 @@ async def register_submit(
     if not name or not email or not password:
         return templates.TemplateResponse("register.html", {
             "request": request,
-            "error": "נא למלא את כל השדות"
+            "error": "Please fill all fields."
         })
 
     existing_user = await db["users"].find_one({"email": email})
     if existing_user:
         return templates.TemplateResponse("register.html", {
             "request": request,
-            "error": "משתמש עם האימייל הזה כבר קיים"
+            "error": "A user with this email already exists."
         })
 
     hashed_password = pwd_context.hash(password)
