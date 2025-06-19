@@ -38,16 +38,24 @@
   <section class="max-w-4xl mx-auto mt-2 px-4">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
       <h2 class="text-lg font-bold text-blue-700 dark:text-blue-400 mb-2">Current Preferences</h2>
-      <p class="text-sm">
-        Categories:
-        {% if preferences.categories %}
-          {{ preferences.categories | join(", ") }}
-        {% else %} – {% endif %}<br>
-        Topics:
-        {% if preferences.topics %}
-          {{ preferences.topics | join(", ") }}
-        {% else %} – {% endif %}
-      </p>
+      <div class="text-sm mb-2">
+
+
+<div class="text-sm">
+  <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Topics:</h3>
+  <div class="flex flex-wrap gap-2">
+    {% if preferences.topics %}
+      {% for topic in preferences.topics %}
+        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs dark:bg-green-900 dark:text-green-200">
+          {{ topic }}
+        </span>
+      {% endfor %}
+    {% else %}
+      <span class="text-gray-400">–</span>
+    {% endif %}
+  </div>
+</div>
+
     </div>
   </section>
 
