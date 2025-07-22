@@ -11,7 +11,7 @@ from backend.routers import auth, users, profile, preferences, news , favorites
 app = FastAPI()
 
 # ✅ mount static only if directory exists
-static_dir = "backend/static"
+static_dir = "static"
 if os.path.isdir(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
 else:
@@ -50,5 +50,7 @@ async def redirect_unauthorized(request: Request, exc: StarletteHTTPException):
 # ✅ אפשרות להריץ ישירות main.py
 if __name__ == "__main__":
     import uvicorn
-    print("🚀 מריץ ישירות main.py")
-    uvicorn.run("main:app", host="0.0.0.0", port=8081, reload=True)
+    import os
+    port = int(os.getenv("PORT", 8081))
+    print(f"🚀 מריץ ישירות main.py על פורט {port}")
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
