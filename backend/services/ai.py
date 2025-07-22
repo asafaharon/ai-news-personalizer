@@ -1,14 +1,15 @@
-# backend/routers/ai.py
+# backend/services/ai.py
 
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from backend.routers.auth import get_current_user
-import openai
+from openai import OpenAI
 import os
 import redis.asyncio as redis
-from backend.core.config import REDIS_URL
+from backend.core.config import REDIS_URL, OPENAI_API_KEY
+
 router = APIRouter()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai_client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
 
 class AIRequest(BaseModel):
@@ -27,8 +28,11 @@ def ask_openai(
     payload: AIRequest,
     current_user: dict = Depends(get_current_user)
 ):
+    if not openai_client:
+        raise HTTPException(status_code=500, detail="OpenAI not configured")
+        
     try:
-        response = openai.chat.completions.create(
+        response = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "אתה עוזר אינטיליגנטי בעברית."},
@@ -39,4 +43,5 @@ def ask_openai(
         )
         return {"answer": response.choices[0].message.content.strip()}
     except Exception as e:
+        print(f"❌ OpenAI Error in ai service: {e}")
         raise HTTPException(status_code=500, detail=f"OpenAI Error: {str(e)}")

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from backend.schemas.profile import ProfilePreferences
@@ -8,48 +8,47 @@ from backend.db.mongo import db
 from backend.models.user import user_helper
 from datetime import datetime
 from pathlib import Path
+from typing import List, Annotated
 import requests
-import openai
 import os
 from backend.auth.security import verify_password, get_password_hash
+from openai import OpenAI
 
-from typing import List               # <-- ודא שהייבוא הזה נמצא בראש הקובץ
-from fastapi import APIRouter, Depends, HTTPException, Request, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
-from typing import Annotated   # למעלה בקובץ
-from typing import List               # <-- ודא שהייבוא הזה נמצא בראש הקובץ
-from fastapi import APIRouter, Depends, HTTPException, Request, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
-# ... שאר הייבוא כפי שהיה ...
 router = APIRouter()
 templates = Jinja2Templates(directory=Path(__file__).parent.parent / "templates")
 
 NEWS_API_KEY = os.getenv("NEWS_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 NEWS_API_URL = "https://newsdata.io/api/1/news"
-openai.api_key = OPENAI_API_KEY
+
+# Initialize OpenAI client
+openai_client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
 def get_openai_summary(text: str, lang: str = "en") -> str:
+    if not openai_client:
+        return "OpenAI not configured"
+    
     system_prompt = {
         "he": "אתה מסכם חדשות בעברית בפשטות ובאופן מעניין.",
-        "fr": "Tu résumes les actualités en français de manière claire et intéressante.",
+        "fr": "Tu résumes les actualités en français de manière claire et intéressante.", 
         "es": "Resumes las noticias en español de forma clara y atractiva.",
         "en": "You summarize news articles in clear and engaging English.",
     }.get(lang, "You summarize news articles in clear and engaging English.")
 
     try:
-        response = openai.chat.completions.create(
+        response = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Summarize this article:\n\n{text}"},
+                {"role": "user", "content": f"Summarize this article in 2-3 sentences:\n\n{text[:1500]}"},  # Limit text length
             ],
             temperature=0.7,
-            max_tokens=200,
+            max_tokens=150,  # Shorter summaries
         )
         return response.choices[0].message.content.strip()
-    except Exception:
-        return "Error in summary with AI" if lang == "he" else "AI summary error"
+    except Exception as e:
+        print(f"❌ OpenAI Error: {e}")
+        return f"AI summary error: {str(e)[:50]}..."
 
 
 # backend/routers/profile.py
