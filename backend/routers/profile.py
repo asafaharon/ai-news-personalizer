@@ -28,27 +28,41 @@ def get_openai_summary(text: str, lang: str = "en") -> str:
     if not openai_client:
         return "OpenAI not configured"
     
+    # Check if content is meaningful
+    if len(text.strip()) < 30:
+        return "Not enough content to summarize"
+    
+    # Check for limited content indicators
+    if "paid plans" in text.lower() or "premium content" in text.lower():
+        return "Full content requires premium access - check original article"
+    
     system_prompt = {
         "he": "אתה מסכם חדשות בעברית בפשטות ובאופן מעניין.",
         "fr": "Tu résumes les actualités en français de manière claire et intéressante.", 
         "es": "Resumes las noticias en español de forma clara y atractiva.",
-        "en": "You summarize news articles in clear and engaging English.",
-    }.get(lang, "You summarize news articles in clear and engaging English.")
+        "en": "You are a news summarizer. Create a clear, engaging summary in 2-3 sentences. If the content is limited or incomplete, say 'Limited preview available - visit article for full details' instead of making up information.",
+    }.get(lang, "You are a news summarizer. Create a clear, engaging summary in 2-3 sentences. If the content is limited or incomplete, say 'Limited preview available - visit article for full details' instead of making up information.")
 
     try:
         response = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Summarize this article in 2-3 sentences:\n\n{text[:1500]}"},  # Limit text length
+                {"role": "user", "content": f"Summarize this news content:\n\n{text[:1000]}"},
             ],
-            temperature=0.7,
-            max_tokens=150,  # Shorter summaries
+            temperature=0.3,  # Lower temperature for more factual summaries
+            max_tokens=100,
         )
-        return response.choices[0].message.content.strip()
+        summary = response.choices[0].message.content.strip()
+        
+        # Filter out unhelpful responses
+        if "cannot provide" in summary.lower() or "sorry" in summary.lower():
+            return "Limited preview available - visit article for full details"
+            
+        return summary
     except Exception as e:
         print(f"❌ OpenAI Error: {e}")
-        return f"AI summary error: {str(e)[:50]}..."
+        return "Summary unavailable - visit article for full details"
 
 
 # backend/routers/profile.py
@@ -145,15 +159,32 @@ async def dashboard(request: Request, user=Depends(get_current_user)):
     articles = []
     # NewsData.io returns results in 'results' field, not 'articles'
     for a in data.get("results", []):
-        full_text = a.get("content") or a.get("description") or a.get("title", "")
+        # Get the best available text content
+        title = a.get("title", "")
+        description = a.get("description", "")
+        content = a.get("content", "")
+        
+        # Combine available text, prioritizing description over content for free tier
+        full_text = ""
+        if description and len(description) > 50:
+            full_text = f"{title}. {description}"
+        elif content and len(content) > 50:
+            full_text = f"{title}. {content}"
+        else:
+            full_text = title
+            
+        # Generate summary
         try:
-            summary = get_openai_summary(full_text)
+            if len(full_text) > 30:  # Only summarize if we have enough content
+                summary = get_openai_summary(full_text)
+            else:
+                summary = "Limited content available - visit link for full article"
         except Exception as e:
             print("❌ שגיאה בתקציר עם OpenAI:", e)
-            summary = "תקציר לא זמין"
+            summary = description[:200] + "..." if description else "Summary not available"
 
         articles.append({
-            "title": a.get("title", "No Title"),
+            "title": title,
             "source": a.get("source_id", "Unknown"),  # NewsData.io uses 'source_id'
             "published": a.get("pubDate", ""),  # NewsData.io uses 'pubDate'
             "url": a.get("link", "#"),  # NewsData.io uses 'link'
