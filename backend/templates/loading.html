@@ -1,63 +1,283 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light" class="smooth-scroll">
 <head>
   <meta charset="UTF-8" />
-  <title>Loading Your News…</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loading Your News… • AI News Personalizer</title>
+  
+  <!-- Tailwind CSS -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/style.css" />
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Theme Detection -->
+  <script>
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
 
-  <!-- Auto-redirect to dashboard after 4 seconds -->
-<script>
-  setTimeout(() => {
-    fetch("/dashboard", { method: "GET" })
-      .then(res => {
-        if (res.ok) {
-          window.location.href = "/dashboard";
-        } else {
-          alert("היתה שגיאה בעת טעינת החדשות. אנא נסה שוב מאוחר יותר.");
+  <!-- Loading Logic -->
+  <script>
+    // Enhanced loading with progress tracking
+    let progress = 0;
+    let loadingMessages = [
+      "Analyzing your preferences...",
+      "Fetching latest news articles...", 
+      "AI is personalizing your feed...",
+      "Organizing articles by relevance...",
+      "Almost ready, finalizing your dashboard..."
+    ];
+    let currentMessageIndex = 0;
+    
+    function updateProgress() {
+      const progressBar = document.getElementById('progressBar');
+      const loadingMessage = document.getElementById('loadingMessage');
+      const progressText = document.getElementById('progressText');
+      
+      if (progressBar && loadingMessage && progressText) {
+        progress += Math.random() * 15 + 5; // Increment by 5-20%
+        
+        if (progress > 100) progress = 100;
+        
+        progressBar.style.width = progress + '%';
+        progressText.textContent = Math.round(progress) + '%';
+        
+        // Update message based on progress
+        if (progress > 20 && currentMessageIndex === 0) {
+          currentMessageIndex = 1;
+          loadingMessage.textContent = loadingMessages[currentMessageIndex];
+        } else if (progress > 40 && currentMessageIndex === 1) {
+          currentMessageIndex = 2;
+          loadingMessage.textContent = loadingMessages[currentMessageIndex];
+        } else if (progress > 60 && currentMessageIndex === 2) {
+          currentMessageIndex = 3;
+          loadingMessage.textContent = loadingMessages[currentMessageIndex];
+        } else if (progress > 80 && currentMessageIndex === 3) {
+          currentMessageIndex = 4;
+          loadingMessage.textContent = loadingMessages[currentMessageIndex];
         }
-      })
-      .catch(() => {
-        alert("הייתה תקלה בחיבור לשרת.");
-      });
-  }, 10000);
-</script>
+        
+        if (progress >= 100) {
+          setTimeout(() => {
+            window.location.href = "/dashboard";
+          }, 500);
+        }
+      }
+    }
+    
+    // Start progress simulation after page loads
+    window.addEventListener('DOMContentLoaded', function() {
+      // Initialize first message
+      const loadingMessage = document.getElementById('loadingMessage');
+      if (loadingMessage) {
+        loadingMessage.textContent = loadingMessages[0];
+      }
+      
+      // Update progress every 300-800ms for realistic feel
+      const progressInterval = setInterval(() => {
+        updateProgress();
+        if (progress >= 100) {
+          clearInterval(progressInterval);
+        }
+      }, Math.random() * 500 + 300);
+      
+      // Backup redirect after 10 seconds
+      setTimeout(() => {
+        if (progress < 100) {
+          window.location.href = "/dashboard";
+        }
+      }, 10000);
+    });
+  </script>
 </head>
 
-<body class="bg-gradient-to-br from-blue-200 to-blue-500 min-h-screen flex items-center justify-center px-4">
-  <div class="text-center text-white max-w-xl">
-    <p class="text-3xl font-bold mb-4 animate-pulse">
-      Loading personalized news…
-    </p>
+<body class="hero-gradient min-h-screen flex items-center justify-center font-sans transition-colors duration-300 safe-area-inset-top safe-area-inset-bottom relative overflow-hidden">
+  
+  <!-- Animated Background Pattern -->
+  <div class="absolute inset-0 opacity-10">
+    <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 1px, transparent 0); background-size: 40px 40px; animation: backgroundFloat 20s linear infinite;"></div>
+  </div>
 
-    <p class="text-lg mb-6">
-      We’re matching your preferences and fetching the best articles 🎯
-    </p>
-
-    <div class="grid gap-3 text-sm text-white/90">
-      <div class="bg-white/10 backdrop-blur-sm p-3 rounded-xl shadow-md">
-        🛠️ <span class="font-semibold">Update your preferences</span><br />
-        Choose topics, and how many articles you want.
-      </div>
-      <div class="bg-white/10 backdrop-blur-sm p-3 rounded-xl shadow-md">
-        ⭐ <span class="font-semibold">Save your favorite articles</span><br />
-        Mark any article you like to keep it for later reading.
-      </div>
-      <div class="bg-white/10 backdrop-blur-sm p-3 rounded-xl shadow-md">
-        🔐 <span class="font-semibold">Change your password</span><br />
-        Manage your account securely anytime from your profile.
-      </div>
+  <!-- Floating Elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="floating-element" style="top: 20%; left: 10%; animation-delay: 0s;">
+      <div class="w-4 h-4 bg-white/20 rounded-full"></div>
     </div>
-
-    <div class="mt-8">
-      <svg class="animate-spin h-10 w-10 mx-auto text-white"
-           xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10"
-                stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor"
-              d="M4 12a8 8 0 018-8v8H4z"></path>
-      </svg>
+    <div class="floating-element" style="top: 60%; left: 80%; animation-delay: 1s;">
+      <div class="w-6 h-6 bg-white/15 rounded-full"></div>
+    </div>
+    <div class="floating-element" style="top: 30%; left: 70%; animation-delay: 2s;">
+      <div class="w-3 h-3 bg-white/25 rounded-full"></div>
+    </div>
+    <div class="floating-element" style="top: 80%; left: 20%; animation-delay: 0.5s;">
+      <div class="w-5 h-5 bg-white/20 rounded-full"></div>
     </div>
   </div>
+
+  <!-- Main Loading Content -->
+  <div class="relative z-10 w-full max-w-2xl mx-4">
+    
+    <!-- Logo and Header -->
+    <div class="text-center mb-12 animate-fade-in">
+      <div class="w-20 h-20 mx-auto mb-6 rounded-3xl bg-white/20 backdrop-blur flex items-center justify-center animate-pulse">
+        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364-.636l-.707.707M21 12h-1M17.657 17.657l-.707-.707M12 21v-1m-6.364-.636l.707-.707M3 12h1m3.343-5.657l.707.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+        </svg>
+      </div>
+      
+      <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 animate-fade-in" style="animation-delay: 0.2s;">
+        AI News Personalizer
+      </h1>
+      
+      <p class="text-xl md:text-2xl text-white/90 mb-2 animate-fade-in" style="animation-delay: 0.4s;">
+        Curating your personalized news feed
+      </p>
+    </div>
+
+    <!-- Loading Progress -->
+    <div class="card backdrop-blur bg-white/10 p-8 mb-8 animate-fade-in" style="animation-delay: 0.6s;">
+      <div class="text-center mb-6">
+        <div id="loadingMessage" class="text-lg font-medium text-white mb-4 min-h-[1.5rem]">
+          Initializing...
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="w-full bg-white/20 rounded-full h-3 mb-4 overflow-hidden">
+          <div id="progressBar" class="bg-gradient-to-r from-green-400 to-blue-400 h-3 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+        </div>
+        
+        <div class="flex justify-between items-center text-sm text-white/80">
+          <span>Progress</span>
+          <span id="progressText">0%</span>
+        </div>
+      </div>
+      
+      <!-- Animated AI Icon -->
+      <div class="flex justify-center">
+        <div class="relative">
+          <div class="w-16 h-16 bg-gradient-to-r from-blue-400 to-purple-500 rounded-2xl flex items-center justify-center animate-pulse">
+            <svg class="w-8 h-8 text-white animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364-.636l-.707.707M21 12h-1M17.657 17.657l-.707-.707M12 21v-1m-6.364-.636l.707-.707M3 12h1m3.343-5.657l.707.707" />
+            </svg>
+          </div>
+          <!-- Pulsing rings -->
+          <div class="absolute inset-0 rounded-2xl border border-white/30 animate-ping"></div>
+          <div class="absolute inset-0 rounded-2xl border border-white/20 animate-ping" style="animation-delay: 0.5s;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature Highlights -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div class="card backdrop-blur bg-white/10 p-6 text-center text-white animate-fade-in" style="animation-delay: 0.8s;">
+        <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-r from-green-400 to-emerald-500 flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </div>
+        <h3 class="font-semibold mb-2">Smart Personalization</h3>
+        <p class="text-sm text-white/80">AI learns your preferences to deliver the most relevant news</p>
+      </div>
+      
+      <div class="card backdrop-blur bg-white/10 p-6 text-center text-white animate-fade-in" style="animation-delay: 1.0s;">
+        <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-r from-blue-400 to-cyan-500 flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </div>
+        <h3 class="font-semibold mb-2">Save Favorites</h3>
+        <p class="text-sm text-white/80">Bookmark articles you love for easy access later</p>
+      </div>
+      
+      <div class="card backdrop-blur bg-white/10 p-6 text-center text-white animate-fade-in" style="animation-delay: 1.2s;">
+        <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <h3 class="font-semibold mb-2">Lightning Fast</h3>
+        <p class="text-sm text-white/80">Get your personalized feed in seconds, not minutes</p>
+      </div>
+    </div>
+
+    <!-- Loading Tips -->
+    <div class="text-center text-white/80 animate-fade-in" style="animation-delay: 1.3s;">
+      <p class="text-sm mb-4">💡 <strong>Pro Tip:</strong> Customize your preferences anytime from your dashboard</p>
+      <div class="flex items-center justify-center space-x-4 text-xs">
+        <span class="flex items-center">
+          <div class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+          Secure
+        </span>
+        <span class="flex items-center">
+          <div class="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
+          Fast
+        </span>
+        <span class="flex items-center">
+          <div class="w-2 h-2 bg-purple-400 rounded-full mr-2 animate-pulse"></div>
+          Personalized
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Styles -->
+  <style>
+    @keyframes backgroundFloat {
+      0% { transform: translate(0, 0); }
+      25% { transform: translate(-10px, -10px); }
+      50% { transform: translate(10px, -5px); }
+      75% { transform: translate(-5px, 10px); }
+      100% { transform: translate(0, 0); }
+    }
+    
+    .floating-element {
+      position: absolute;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      25% { transform: translateY(-20px) rotate(90deg); }
+      50% { transform: translateY(-10px) rotate(180deg); }
+      75% { transform: translateY(-15px) rotate(270deg); }
+    }
+    
+    .animate-fade-in {
+      animation: fadeInUp 0.8s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 640px) {
+      .hero-gradient {
+        background-attachment: scroll; /* Fix for iOS */
+      }
+      
+      .card {
+        margin: 0.5rem;
+        padding: 1.5rem;
+      }
+    }
+  </style>
 </body>
 </html>

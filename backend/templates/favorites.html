@@ -1,52 +1,417 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light" class="smooth-scroll">
 <head>
   <meta charset="UTF-8" />
-  <title>My Favorites</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Favorites • AI News Personalizer</title>
+  
+  <!-- Tailwind CSS -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/style.css" />
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Theme Detection -->
+  <script>
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
 </head>
-<body class="bg-gray-100 min-h-screen font-sans">
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans transition-colors duration-300 safe-area-inset-top safe-area-inset-bottom">
 
   <!-- Header -->
-  <header class="bg-blue-700 text-white py-4 shadow">
-    <div class="max-w-4xl mx-auto px-4 flex items-center justify-between">
-      <h1 class="text-xl md:text-2xl font-semibold">
-        ⭐ {{ user.full_name }}'s Favorites
-      </h1>
-      <a href="/dashboard"
-         class="bg-white text-blue-700 px-4 py-1.5 rounded shadow hover:bg-gray-100">
-        ← Back to Dashboard
-      </a>
+  <header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 transition-all duration-300">
+    <div class="container-responsive">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-4">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-600 flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-lg font-semibold text-gray-900 dark:text-white">My Favorites</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400 hidden md:block">Your saved articles collection</p>
+          </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <!-- Theme Toggle -->
+          <button id="themeToggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors touch-target">
+            <svg id="lightIcon" class="w-5 h-5 text-gray-500 dark:text-gray-400 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            <svg id="darkIcon" class="w-5 h-5 text-gray-500 dark:text-gray-400 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+          </button>
+          
+          <!-- Back to Dashboard -->
+          <a href="/dashboard" class="btn btn-secondary px-4 py-2 text-sm interactive touch-target">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Dashboard
+          </a>
+        </div>
+      </div>
     </div>
   </header>
 
-  <!-- Favorites list -->
-  <main class="max-w-4xl mx-auto p-4">
-    {% if favorites %}
-      {% for fav in favorites %}
-        <article class="bg-white p-4 rounded-lg shadow border border-gray-200 mb-6">
-          <h2 class="text-xl font-bold text-blue-700 mb-1">{{ fav.title }}</h2>
-          <p class="text-sm text-gray-500 mb-2">
-            {{ fav.published[:10] }} &nbsp;|&nbsp; {{ fav.source }}
-          </p>
+  <!-- Main Content -->
+  <main class="container-responsive py-8 safe-area-inset-left safe-area-inset-right">
+    
+    <!-- Page Header -->
+    <div class="text-center mb-12">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-r from-yellow-500 to-orange-600 flex items-center justify-center animate-fade-in">
+        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+        </svg>
+      </div>
+      <h1 class="text-3xl md:text-4xl font-bold text-gradient mb-3">Your Favorite Articles</h1>
+      <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+        All the articles you've saved for later reading, organized in one convenient place.
+      </p>
+    </div>
 
-          <div class="flex items-center gap-3">
-            <a href="{{ fav.url }}" target="_blank"
-               class="text-blue-600 hover:underline">Read full article</a>
-
-            <!-- Remove from favorites -->
-            <form method="post" action="/favorites/remove"
-                  onsubmit="return confirm('Remove from favorites?');">
-              <input type="hidden" name="url" value="{{ fav.url }}">
-              <button type="submit" class="text-red-600 hover:text-red-800 text-xl">✖</button>
-            </form>
+    <!-- Search and Filter Bar -->
+    <div class="card p-6 mb-8">
+      <div class="flex flex-col md:flex-row gap-4 items-center">
+        <div class="flex-1 relative">
+          <input 
+            type="text" 
+            placeholder="Search your favorites..." 
+            id="searchFavorites"
+            class="form-input pl-10 pr-4 py-2 w-full text-sm"
+          />
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
           </div>
-        </article>
-      {% endfor %}
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <select id="sortBy" class="form-input text-sm py-2">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="title">By Title</option>
+            <option value="source">By Source</option>
+          </select>
+          
+          <span class="text-sm text-gray-500 dark:text-gray-400">
+            <span id="favoriteCount">{{ favorites|length if favorites else 0 }}</span> articles
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Favorites List -->
+    {% if favorites %}
+      <div id="favoritesList" class="space-y-6">
+        {% for fav in favorites %}
+          <article class="card news-card p-6 group desktop-hover transition-all duration-300 animate-fade-in favorite-item" data-title="{{ fav.title|lower }}" data-source="{{ fav.source|lower }}" data-date="{{ fav.published }}">
+            <div class="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
+              
+              <!-- Article Image Placeholder -->
+              <div class="w-full md:w-32 h-48 md:h-32 bg-gradient-to-br from-yellow-100 to-orange-200 dark:from-yellow-900/30 dark:to-orange-800/30 rounded-lg flex-shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                <svg class="w-8 h-8 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+              </div>
+
+              <!-- Article Content -->
+              <div class="flex-1 min-w-0">
+                
+                <!-- Favorite Badge -->
+                <div class="flex items-center mb-2">
+                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200">
+                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                    </svg>
+                    Favorite
+                  </span>
+                </div>
+                
+                <!-- Article Header -->
+                <div class="mb-3">
+                  <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-yellow-600 dark:group-hover:text-yellow-400 transition-colors line-clamp-2">
+                    {{ fav.title }}
+                  </h2>
+                  <div class="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                    <span class="inline-flex items-center">
+                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      {{ fav.published[:10] }}
+                    </span>
+                    <span class="inline-flex items-center">
+                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                      </svg>
+                      {{ fav.source }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col space-y-3 md:flex-row md:space-y-0 md:items-center md:justify-between">
+                  <div class="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-4">
+                    <a href="{{ fav.url }}" target="_blank" class="btn btn-primary text-sm interactive touch-target">
+                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                      <span class="hidden-mobile">Read Full Article</span>
+                      <span class="hidden-desktop">Read More</span>
+                    </a>
+                    
+                    <!-- Share Button -->
+                    <button onclick="shareArticle('{{ fav.title }}', '{{ fav.url }}')" class="btn btn-secondary text-sm interactive touch-target">
+                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                      </svg>
+                      Share
+                    </button>
+                  </div>
+
+                  <!-- Remove from Favorites -->
+                  <form method="post" action="/favorites/remove" class="inline-block" onsubmit="return confirmRemove('{{ fav.title }}')">
+                    <input type="hidden" name="url" value="{{ fav.url }}">
+                    <button type="submit" class="touch-target p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors group" title="Remove from Favorites">
+                      <svg class="w-5 h-5 text-gray-400 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
     {% else %}
-      <p class="text-center text-gray-500">You haven't saved any favorites yet.</p>
+      <!-- Empty State -->
+      <div class="text-center py-16">
+        <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 flex items-center justify-center">
+          <svg class="w-12 h-12 text-yellow-500 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Favorites Yet</h3>
+        <p class="text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto">
+          Start building your personal collection by saving articles you love from your dashboard.
+        </p>
+        <a href="/dashboard" class="btn btn-primary">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+          </svg>
+          Browse News Articles
+        </a>
+      </div>
     {% endif %}
   </main>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed top-20 right-4 z-40 space-y-2 safe-area-inset-right"></div>
+
+  <!-- Scroll to Top Button -->
+  <button id="scrollToTop" class="scroll-to-top" aria-label="Scroll to top">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+    </svg>
+  </button>
+
+  <!-- JavaScript -->
+  <script>
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const lightIcon = document.getElementById('lightIcon');
+    const darkIcon = document.getElementById('darkIcon');
+
+    themeToggle.addEventListener('click', function() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      if (newTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        lightIcon.classList.remove('hidden');
+        darkIcon.classList.add('hidden');
+      } else {
+        document.documentElement.classList.remove('dark');
+        lightIcon.classList.add('hidden');
+        darkIcon.classList.remove('hidden');
+      }
+      
+      showToast('Theme updated to ' + newTheme + ' mode', 'info');
+    });
+
+    // Search Functionality
+    const searchInput = document.getElementById('searchFavorites');
+    if (searchInput) {
+      searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const favorites = document.querySelectorAll('.favorite-item');
+        let visibleCount = 0;
+        
+        favorites.forEach(item => {
+          const title = item.dataset.title;
+          const source = item.dataset.source;
+          
+          if (title.includes(searchTerm) || source.includes(searchTerm)) {
+            item.style.display = 'block';
+            visibleCount++;
+          } else {
+            item.style.display = searchTerm ? 'none' : 'block';
+            if (!searchTerm) visibleCount++;
+          }
+        });
+        
+        // Update count
+        const favoriteCount = document.getElementById('favoriteCount');
+        if (favoriteCount) {
+          favoriteCount.textContent = visibleCount;
+        }
+      });
+    }
+
+    // Sort Functionality
+    const sortSelect = document.getElementById('sortBy');
+    if (sortSelect) {
+      sortSelect.addEventListener('change', function(e) {
+        const sortBy = e.target.value;
+        const container = document.getElementById('favoritesList');
+        const items = Array.from(document.querySelectorAll('.favorite-item'));
+        
+        items.sort((a, b) => {
+          switch (sortBy) {
+            case 'newest':
+              return new Date(b.dataset.date) - new Date(a.dataset.date);
+            case 'oldest':
+              return new Date(a.dataset.date) - new Date(b.dataset.date);
+            case 'title':
+              return a.dataset.title.localeCompare(b.dataset.title);
+            case 'source':
+              return a.dataset.source.localeCompare(b.dataset.source);
+            default:
+              return 0;
+          }
+        });
+        
+        // Re-append sorted items
+        items.forEach(item => container.appendChild(item));
+        showToast('Favorites sorted by ' + sortBy.replace('_', ' '), 'info');
+      });
+    }
+
+    // Share Article Function
+    function shareArticle(title, url) {
+      if (navigator.share) {
+        navigator.share({
+          title: title,
+          url: url
+        }).then(() => {
+          showToast('Article shared successfully!', 'success');
+        }).catch((error) => {
+          console.log('Error sharing:', error);
+          fallbackShare(title, url);
+        });
+      } else {
+        fallbackShare(title, url);
+      }
+    }
+
+    function fallbackShare(title, url) {
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('Article link copied to clipboard!', 'success');
+      }).catch(() => {
+        showToast('Unable to share article', 'error');
+      });
+    }
+
+    // Confirm Remove Function
+    function confirmRemove(title) {
+      const confirmed = confirm(`Are you sure you want to remove "${title.substring(0, 50)}..." from your favorites?`);
+      if (confirmed) {
+        showToast('Article removed from favorites', 'success');
+      }
+      return confirmed;
+    }
+
+    // Toast Notification System
+    function showToast(message, type = 'info') {
+      const toastContainer = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type} animate-fade-in`;
+      toast.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span>${message}</span>
+          <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      `;
+      
+      toastContainer.appendChild(toast);
+      
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.remove();
+        }
+      }, 5000);
+    }
+
+    // Scroll to Top Functionality
+    const scrollToTopBtn = document.getElementById('scrollToTop');
+    
+    window.addEventListener('scroll', function() {
+      if (window.pageYOffset > 300) {
+        scrollToTopBtn.classList.add('visible');
+      } else {
+        scrollToTopBtn.classList.remove('visible');
+      }
+    });
+    
+    scrollToTopBtn.addEventListener('click', function() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    // Enhanced touch support for mobile
+    if ('ontouchstart' in window) {
+      document.body.classList.add('touch-device');
+    }
+
+    // Add CSS classes for line clamping
+    const style = document.createElement('style');
+    style.textContent = `
+      .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+
 </body>
 </html>
