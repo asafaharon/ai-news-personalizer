@@ -127,12 +127,12 @@ async def dashboard(request: Request, user=Depends(get_current_user)):
         print("❌ חסר NEWS_API_KEY")
         raise HTTPException(500, detail="Missing NEWS_API_KEY")
 
+    # NewsData.io API parameters
     params = {
         "q": query,
-        "apiKey": NEWS_API_KEY,
-        "sortBy": "publishedAt",
+        "apikey": NEWS_API_KEY,  # NewsData.io uses 'apikey' not 'apiKey'
         "language": "en",
-        "pageSize": page_size,
+        "size": min(page_size, 10),  # NewsData.io uses 'size' not 'pageSize', max 10 for free tier
     }
 
     try:
@@ -144,7 +144,8 @@ async def dashboard(request: Request, user=Depends(get_current_user)):
         raise HTTPException(502, detail=f"News API error: {str(e)}")
 
     articles = []
-    for a in data.get("articles", []):
+    # NewsData.io returns results in 'results' field, not 'articles'
+    for a in data.get("results", []):
         full_text = a.get("content") or a.get("description") or a.get("title", "")
         try:
             summary = get_openai_summary(full_text)
@@ -154,9 +155,9 @@ async def dashboard(request: Request, user=Depends(get_current_user)):
 
         articles.append({
             "title": a.get("title", "No Title"),
-            "source": a.get("source", {}).get("name", "Unknown"),
-            "published": a.get("publishedAt", ""),
-            "url": a.get("url", "#"),
+            "source": a.get("source_id", "Unknown"),  # NewsData.io uses 'source_id'
+            "published": a.get("pubDate", ""),  # NewsData.io uses 'pubDate'
+            "url": a.get("link", "#"),  # NewsData.io uses 'link'
             "summary": summary,
         })
 
