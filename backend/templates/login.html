@@ -1,62 +1,206 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <title>Log In &middot; AI News Personalizer</title>
+  <title>Sign In • AI News Personalizer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  
   <!-- Tailwind CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-        rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/style.css" />
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Theme Detection -->
+  <script>
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
 </head>
 
-<body class="bg-gray-50 flex items-center justify-center min-h-screen p-4">
-
-  <!-- Error message -->
-  {% if error %}
-  <div role="alert"
-       class="bg-red-100 text-red-700 p-2 text-sm mb-4 text-center rounded max-w-sm w-full">
-    {{ error }}
+<body class="min-h-screen hero-gradient flex items-center justify-center p-4 relative">
+  
+  <!-- Background Pattern -->
+  <div class="absolute inset-0 opacity-10">
+    <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 1px, transparent 0); background-size: 40px 40px;"></div>
   </div>
-  {% endif %}
 
-  <!-- Login card -->
-  <form action="/login" method="post"
-        class="bg-white shadow-lg p-8 rounded-lg w-full max-w-sm"
-        aria-labelledby="login-heading">
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
-    <h1 id="login-heading" class="text-2xl font-bold text-center mb-6">
-      Log&nbsp;In
-    </h1>
+  <!-- Main Content -->
+  <div class="relative z-10 w-full max-w-md">
+    
+    <!-- Error message -->
+    {% if error %}
+    <div role="alert" class="toast toast-error mb-4 relative animate-fade-in">
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+        </svg>
+        {{ error }}
+      </div>
+    </div>
+    {% endif %}
 
-    <!-- Email -->
-    <label class="sr-only" for="email">Email address</label>
-    <input id="email" type="email" name="email" required
-           placeholder="Email"
-           autocomplete="email"
-           class="w-full p-2 border rounded mb-4" />
+    <!-- Login Card -->
+    <div class="card backdrop-blur p-8 bg-white/90 dark:bg-gray-800/90 animate-fade-in">
+      
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <h1 class="text-3xl font-bold text-gradient mb-2">Welcome Back</h1>
+        <p class="text-gray-600 dark:text-gray-400">Sign in to your account</p>
+      </div>
 
-    <!-- Password -->
-    <label class="sr-only" for="password">Password</label>
-    <input id="password" type="password" name="password" required
-           placeholder="Password"
-           autocomplete="current-password"
-           class="w-full p-2 border rounded mb-6" />
+      <!-- Login Form -->
+      <form id="loginForm" action="/login" method="post" class="space-y-6">
+        
+        <!-- Email Field -->
+        <div class="space-y-2">
+          <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Email address
+          </label>
+          <div class="relative">
+            <input 
+              id="email" 
+              type="email" 
+              name="email" 
+              required
+              placeholder="Enter your email"
+              autocomplete="email"
+              class="form-input focus-ring pl-10" 
+            />
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+              </svg>
+            </div>
+          </div>
+        </div>
 
-    <!-- Submit -->
-    <button type="submit"
-            class="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700 transition">
-      Log&nbsp;In
-    </button>
+        <!-- Password Field -->
+        <div class="space-y-2">
+          <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Password
+          </label>
+          <div class="relative">
+            <input 
+              id="password" 
+              type="password" 
+              name="password" 
+              required
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              class="form-input focus-ring pl-10 pr-10"
+            />
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <svg id="eyeOpen" class="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <svg id="eyeClosed" class="h-5 w-5 text-gray-400 hover:text-gray-600 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L12 12m-2.122-2.122L7.758 7.758M12 12l2.122 2.122m-2.122-2.122L14.122 9.878m-2.122 2.122l2.122 2.122" />
+              </svg>
+            </button>
+          </div>
+        </div>
 
-    <!-- Link to register -->
-    <p class="text-sm text-center mt-4">
-      Don’t have an account?
-      <a href="/register" class="text-blue-600 hover:underline font-medium">
-        Sign&nbsp;Up
-      </a>
-    </p>
+        <!-- Submit Button -->
+        <button 
+          type="submit" 
+          id="submitBtn"
+          class="btn btn-primary w-full py-3 text-base font-semibold focus-ring"
+        >
+          <span id="buttonText">Sign In</span>
+          <div id="buttonSpinner" class="spinner hidden"></div>
+        </button>
 
-  </form>
+      </form>
+
+      <!-- Divider -->
+      <div class="mt-6">
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white/90 dark:bg-gray-800/90 text-gray-500">New to AI News?</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sign Up Link -->
+      <div class="mt-6 text-center">
+        <a href="/register" class="btn btn-secondary w-full py-3 text-base interactive">
+          Create your account
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-8 text-center">
+      <p class="text-sm text-white/80">
+        Secure • Fast • Personalized
+      </p>
+    </div>
+
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Password toggle functionality
+    document.getElementById('togglePassword').addEventListener('click', function() {
+      const password = document.getElementById('password');
+      const eyeOpen = document.getElementById('eyeOpen');
+      const eyeClosed = document.getElementById('eyeClosed');
+      
+      if (password.type === 'password') {
+        password.type = 'text';
+        eyeOpen.classList.add('hidden');
+        eyeClosed.classList.remove('hidden');
+      } else {
+        password.type = 'password';
+        eyeOpen.classList.remove('hidden');
+        eyeClosed.classList.add('hidden');
+      }
+    });
+
+    // Form submission with loading state
+    document.getElementById('loginForm').addEventListener('submit', function() {
+      const submitBtn = document.getElementById('submitBtn');
+      const buttonText = document.getElementById('buttonText');
+      const buttonSpinner = document.getElementById('buttonSpinner');
+      
+      submitBtn.disabled = true;
+      submitBtn.classList.add('opacity-75');
+      buttonText.textContent = 'Signing in...';
+      buttonSpinner.classList.remove('hidden');
+    });
+
+    // Auto-focus first input
+    document.getElementById('email').focus();
+  </script>
+
 </body>
 </html>

@@ -1,113 +1,528 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" data-theme="light" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Personalized News Dashboard</title>
+  <title>{{ user.full_name }}'s News Dashboard • AI News Personalizer</title>
 
   <!-- Tailwind CDN -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
 
-  <!-- Respect system dark-mode before first paint -->
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/style.css" />
+
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Theme Detection -->
   <script>
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
       document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.classList.remove('dark');
     }
   </script>
 </head>
 
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans transition-colors duration-300">
 
-  <!-- Fixed Navbar -->
-  <header class="bg-blue-700 dark:bg-blue-800 text-white py-4 shadow fixed top-0 inset-x-0 z-50">
-    <div class="max-w-4xl mx-auto px-4 flex items-center justify-between">
-      <h1 class="text-lg md:text-2xl font-semibold">Hello {{ user.full_name }}</h1>
-      <nav class="flex gap-3 text-sm">
-        <a href="/profile/edit" class="hover:underline">Edit Profile</a>
-        <a href="/profile"      class="hover:underline">Edit Preferences</a>
-        <a href="/favorites"    class="hover:underline">My&nbsp;Favorites</a>
-        <a href="/logout"       class="text-red-300 hover:text-red-500">Log&nbsp;Out</a>
-      </nav>
+  <!-- Modern Navbar -->
+  <header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 fixed top-0 inset-x-0 z-50 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Logo and Welcome -->
+        <div class="flex items-center space-x-4">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+            </svg>
+          </div>
+          <div class="hidden md:block">
+            <h1 class="text-lg font-semibold text-gray-900 dark:text-white">Welcome back, {{ user.full_name.split()[0] }}!</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Your personalized news dashboard</p>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="hidden md:flex flex-1 max-w-lg mx-8">
+          <div class="relative w-full">
+            <input 
+              type="text" 
+              placeholder="Search news..." 
+              id="searchInput"
+              class="form-input pl-10 pr-4 py-2 w-full text-sm"
+            />
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex items-center space-x-4">
+          
+          <!-- Theme Toggle -->
+          <button id="themeToggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <svg id="lightIcon" class="w-5 h-5 text-gray-500 dark:text-gray-400 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            <svg id="darkIcon" class="w-5 h-5 text-gray-500 dark:text-gray-400 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+          </button>
+
+          <!-- Notifications -->
+          <button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative">
+            <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 3h-2a5 5 0 000 10h8a3 3 0 010 6z"></path>
+            </svg>
+          </button>
+
+          <!-- User Menu -->
+          <div class="relative">
+            <button id="userMenuToggle" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+              <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <span class="text-white text-sm font-medium">{{ user.full_name[0].upper() }}</span>
+              </div>
+              <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            <!-- Dropdown Menu -->
+            <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1">
+              <a href="/profile/edit" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span>Edit Profile</span>
+                </div>
+              </a>
+              <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <span>Preferences</span>
+                </div>
+              </a>
+              <a href="/favorites" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  <span>My Favorites</span>
+                </div>
+              </a>
+              <div class="border-t border-gray-200 dark:border-gray-600 my-1"></div>
+              <a href="/logout" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Sign Out</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </header>
 
-  <!-- Spacer below Navbar -->
-  <div class="pt-20"></div>
-
-  <!-- Preferences card -->
-  <section class="max-w-4xl mx-auto mt-2 px-4">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
-      <h2 class="text-lg font-bold text-blue-700 dark:text-blue-400 mb-2">Current Preferences</h2>
-      <div class="text-sm mb-2">
-
-
-<div class="text-sm">
-  <h3 class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Topics:</h3>
-  <div class="flex flex-wrap gap-2">
-    {% if preferences.topics %}
-      {% for topic in preferences.topics %}
-        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs dark:bg-green-900 dark:text-green-200">
-          {{ topic }}
-        </span>
-      {% endfor %}
-    {% else %}
-      <span class="text-gray-400">–</span>
-    {% endif %}
-  </div>
-</div>
-
-    </div>
-  </section>
-
-  <!-- ███ Skeleton loading while JS mounts -->
-  <div id="loadingSkeleton" class="max-w-4xl mx-auto px-4 animate-pulse space-y-4">
-    {% for _ in range(3) %}
-      <div class="bg-gray-300 dark:bg-gray-700 h-32 rounded"></div>
-    {% endfor %}
-  </div>
-
-  <!-- Articles list -->
-  <main id="articleContainer" class="max-w-4xl mx-auto p-4 hidden">
-    {% if summaries %}
-      {% for item in summaries %}
-        <article class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700 mb-6">
-          <h2 class="text-xl font-bold text-blue-700 dark:text-blue-400 mb-1">{{ item.title }}</h2>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
-            {{ item.published[:10] }} &nbsp;|&nbsp; {{ item.source }}
-          </p>
-          <p class="leading-relaxed mb-2">{{ item.summary }}</p>
-
-          <div class="flex items-center gap-3">
-            <a href="{{ item.url }}" target="_blank" class="text-blue-600 hover:underline">
-              Read full article
-            </a>
-
-            <!-- Add to favorites -->
-            <form method="post" action="/favorites/add">
-              <input type="hidden" name="url"       value="{{ item.url }}">
-              <input type="hidden" name="title"     value="{{ item.title }}">
-              <input type="hidden" name="source"    value="{{ item.source }}">
-              <input type="hidden" name="published" value="{{ item.published }}">
-              <button type="submit" class="text-yellow-500 hover:text-yellow-600 text-xl" title="Save to Favorites">
-                ★
-              </button>
-            </form>
+  <!-- Main Content -->
+  <main class="pt-20 pb-8">
+    
+    <!-- Preferences Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+      <div class="card p-6 mb-8 news-card">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-green-400 to-blue-500 flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-gray-900 dark:text-white">Your Preferences</h2>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Personalized news topics</p>
+            </div>
           </div>
-        </article>
-      {% endfor %}
-    {% else %}
-      <p class="text-center text-gray-500 dark:text-gray-400">
-        No articles found. <a href="/profile" class="text-blue-600 underline">Update your preferences</a>.
-      </p>
-    {% endif %}
+          <a href="/profile" class="btn btn-secondary text-sm interactive">
+            Edit Preferences
+          </a>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <h3 class="font-medium text-gray-700 dark:text-gray-300 mb-3">Active Topics:</h3>
+            <div class="flex flex-wrap gap-2">
+              {% if preferences.topics %}
+                {% for topic in preferences.topics %}
+                  <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 dark:from-blue-900/30 dark:to-purple-900/30 dark:text-blue-200 border border-blue-200 dark:border-blue-800">
+                    <svg class="w-3 h-3 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    {{ topic }}
+                  </span>
+                {% endfor %}
+              {% else %}
+                <div class="flex items-center space-x-2 text-gray-400 dark:text-gray-500">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.99-.833-2.76 0L4.054 16.5C3.284 18.333 4.246 20 5.786 20z" />
+                  </svg>
+                  <span>No topics selected. <a href="/profile" class="text-blue-600 dark:text-blue-400 hover:underline">Add some topics</a> to get personalized news.</span>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Stats -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="card p-6 text-center">
+          <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ summaries|length if summaries else 0 }}</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Articles Today</p>
+        </div>
+        <div class="card p-6 text-center">
+          <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ favorites_count if favorites_count else 0 }}</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Saved Articles</p>
+        </div>
+        <div class="card p-6 text-center">
+          <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">AI</h3>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Powered</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Loading Skeleton -->
+    <div id="loadingSkeleton" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Loading Your News...</h2>
+        <div class="spinner"></div>
+      </div>
+      <div class="grid gap-6">
+        {% for _ in range(3) %}
+          <div class="card p-6 animate-pulse">
+            <div class="flex items-start space-x-4">
+              <div class="skeleton skeleton-dark w-20 h-20 rounded-lg flex-shrink-0"></div>
+              <div class="flex-1 space-y-3">
+                <div class="skeleton skeleton-dark h-4 w-3/4 rounded"></div>
+                <div class="skeleton skeleton-dark h-3 w-1/2 rounded"></div>
+                <div class="space-y-2">
+                  <div class="skeleton skeleton-dark h-3 w-full rounded"></div>
+                  <div class="skeleton skeleton-dark h-3 w-5/6 rounded"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- News Articles -->
+    <section id="articleContainer" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 hidden">
+      
+      <!-- Section Header -->
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Your Personalized News</h2>
+          <p class="text-gray-500 dark:text-gray-400 mt-1">Latest articles tailored to your interests</p>
+        </div>
+        
+        <!-- Filter Options -->
+        <div class="flex items-center space-x-3">
+          <select id="categoryFilter" class="form-input text-sm py-2">
+            <option value="">All Categories</option>
+            <option value="technology">Technology</option>
+            <option value="business">Business</option>
+            <option value="sports">Sports</option>
+            <option value="health">Health</option>
+          </select>
+          <button id="refreshNews" class="btn btn-secondary text-sm interactive">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Articles Grid -->
+      <div class="grid gap-6" id="articlesGrid">
+        {% if summaries %}
+          {% for item in summaries %}
+            <article class="card news-card p-6 group hover:shadow-xl transition-all duration-300 animate-fade-in">
+              <div class="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
+                
+                <!-- Article Image Placeholder -->
+                <div class="w-full md:w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-lg flex-shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                  <svg class="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                  </svg>
+                </div>
+
+                <!-- Article Content -->
+                <div class="flex-1 min-w-0">
+                  
+                  <!-- Article Header -->
+                  <div class="flex items-start justify-between mb-3">
+                    <div class="flex-1">
+                      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                        {{ item.title }}
+                      </h3>
+                      <div class="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400 mb-3">
+                        <span class="inline-flex items-center">
+                          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          {{ item.published[:10] }}
+                        </span>
+                        <span class="inline-flex items-center">
+                          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                          </svg>
+                          {{ item.source }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Article Summary -->
+                  <p class="text-gray-600 dark:text-gray-300 leading-relaxed mb-4 line-clamp-3">
+                    {{ item.summary }}
+                  </p>
+
+                  <!-- Action Buttons -->
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                      <a href="{{ item.url }}" target="_blank" class="btn btn-primary text-sm interactive">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        Read Full Article
+                      </a>
+                      
+                      <!-- Share Button -->
+                      <button onclick="shareArticle('{{ item.title }}', '{{ item.url }}')" class="btn btn-secondary text-sm interactive">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                        </svg>
+                        Share
+                      </button>
+                    </div>
+
+                    <!-- Favorite Button -->
+                    <form method="post" action="/favorites/add" class="inline-block">
+                      <input type="hidden" name="url" value="{{ item.url }}">
+                      <input type="hidden" name="title" value="{{ item.title }}">
+                      <input type="hidden" name="source" value="{{ item.source }}">
+                      <input type="hidden" name="published" value="{{ item.published }}">
+                      <button type="submit" class="p-2 rounded-lg hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition-colors group" title="Save to Favorites">
+                        <svg class="w-5 h-5 text-gray-400 group-hover:text-yellow-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </article>
+          {% endfor %}
+        {% else %}
+          <!-- Empty State -->
+          <div class="text-center py-16">
+            <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center">
+              <svg class="w-12 h-12 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Articles Found</h3>
+            <p class="text-gray-500 dark:text-gray-400 mb-6">
+              We couldn't find any articles matching your preferences. Try updating your topics or check back later.
+            </p>
+            <a href="/profile" class="btn btn-primary">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Update Preferences
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </section>
+
   </main>
 
-  <!-- Hide skeleton once DOM is ready -->
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed top-20 right-4 z-40 space-y-2"></div>
+
+  <!-- JavaScript -->
   <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('loadingSkeleton').style.display = 'none';
-      document.getElementById('articleContainer').classList.remove('hidden');
+    // Theme Toggle Functionality
+    const themeToggle = document.getElementById('themeToggle');
+    const lightIcon = document.getElementById('lightIcon');
+    const darkIcon = document.getElementById('darkIcon');
+
+    themeToggle.addEventListener('click', function() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      if (newTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        lightIcon.classList.remove('hidden');
+        darkIcon.classList.add('hidden');
+      } else {
+        document.documentElement.classList.remove('dark');
+        lightIcon.classList.add('hidden');
+        darkIcon.classList.remove('hidden');
+      }
+      
+      showToast('Theme updated to ' + newTheme + ' mode', 'info');
     });
+
+    // User Menu Toggle
+    const userMenuToggle = document.getElementById('userMenuToggle');
+    const userMenu = document.getElementById('userMenu');
+
+    userMenuToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      userMenu.classList.toggle('hidden');
+    });
+
+    // Close user menu when clicking outside
+    document.addEventListener('click', function() {
+      userMenu.classList.add('hidden');
+    });
+
+    // Search Functionality
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', function(e) {
+      const searchTerm = e.target.value.toLowerCase();
+      const articles = document.querySelectorAll('#articlesGrid article');
+      
+      articles.forEach(article => {
+        const title = article.querySelector('h3').textContent.toLowerCase();
+        const summary = article.querySelector('p').textContent.toLowerCase();
+        
+        if (title.includes(searchTerm) || summary.includes(searchTerm)) {
+          article.style.display = 'block';
+        } else {
+          article.style.display = searchTerm ? 'none' : 'block';
+        }
+      });
+    });
+
+    // Share Article Function
+    function shareArticle(title, url) {
+      if (navigator.share) {
+        navigator.share({
+          title: title,
+          url: url
+        }).then(() => {
+          showToast('Article shared successfully!', 'success');
+        }).catch((error) => {
+          console.log('Error sharing:', error);
+          fallbackShare(title, url);
+        });
+      } else {
+        fallbackShare(title, url);
+      }
+    }
+
+    function fallbackShare(title, url) {
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('Article link copied to clipboard!', 'success');
+      }).catch(() => {
+        showToast('Unable to share article', 'error');
+      });
+    }
+
+    // Toast Notification System
+    function showToast(message, type = 'info') {
+      const toastContainer = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type} animate-fade-in`;
+      toast.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span>${message}</span>
+          <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      `;
+      
+      toastContainer.appendChild(toast);
+      
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.remove();
+        }
+      }, 5000);
+    }
+
+    // Hide loading skeleton and show articles
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        document.getElementById('loadingSkeleton').style.display = 'none';
+        document.getElementById('articleContainer').classList.remove('hidden');
+      }, 1000);
+    });
+
+    // Add CSS classes for line clamping
+    const style = document.createElement('style');
+    style.textContent = `
+      .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+    `;
+    document.head.appendChild(style);
   </script>
+
 </body>
 </html>
