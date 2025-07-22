@@ -26,7 +26,7 @@ templates = Jinja2Templates(directory=Path(__file__).parent.parent / "templates"
 
 NEWS_API_KEY = os.getenv("NEWS_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-NEWS_API_URL = "https://newsapi.org/v2/everything"
+NEWS_API_URL = "https://newsdata.io/api/1/news"
 openai.api_key = OPENAI_API_KEY
 
 def get_openai_summary(text: str, lang: str = "en") -> str:

@@ -23,36 +23,36 @@ def _relevant_to_user(article: NewsArticle, interests: list[str]) -> bool:
     combined = f"{article.title} {article.description or ''} {article.content or ''}".lower()
     return any(term.lower() in combined for term in interests)
 
-# --- המרה של raw dict מ-NewsAPI לכתבות ---
+# --- המרה של raw dict מ-NewsData.io לכתבות ---
 def _parse_articles(raw: dict, interests: list[str]) -> List[NewsArticle]:
     try:
         articles = []
-        for a in raw.get("articles", []):
+        # NewsData.io returns results in 'results' field, not 'articles'
+        for a in raw.get("results", []):
             combined = f"{a.get('title', '')} {a.get('description', '')}"
             if not _looks_english(combined):
                 continue
             parsed = NewsArticle(
-                source=NewsSource(**a["source"]),
-                author=a.get("author"),
+                source=NewsSource(id=a.get("source_id", "unknown"), name=a.get("source_id", "Unknown")),
+                author=a.get("creator", [None])[0] if a.get("creator") else None,
                 title=a["title"],
                 description=a.get("description"),
-                url=a["url"],
-                urlToImage=a.get("urlToImage"),
-                publishedAt=datetime.fromisoformat(a["publishedAt"].replace("Z", "+00:00")),
+                url=a["link"],
+                urlToImage=a.get("image_url"),
+                publishedAt=datetime.fromisoformat(a["pubDate"].replace("Z", "+00:00")) if a.get("pubDate") else datetime.now(),
                 content=a.get("content"),
             )
             if _relevant_to_user(parsed, interests):
                 articles.append(parsed)
         return articles
-    except Exception:
+    except Exception as e:
+        print(f"Error parsing articles: {e}")
         raise HTTPException(500, "Failed to parse news data")
 
 # --- שליפת כתבות מה־API (ללא Cache) ---
 async def _fetch_from_newsapi(query: str, language: str = "en", page_size: int = 10):
-    url = (
-        f"https://newsapi.org/v2/everything?"
-        f"qInTitle={query}&language={language}&pageSize={page_size}&sortBy=publishedAt&apiKey={NEWS_API_KEY}"
-    )
+    # Using NewsData.io API instead of NewsAPI.org
+    url = f"https://newsdata.io/api/1/news?apikey={NEWS_API_KEY}&q={query}&language={language}&size={page_size}"
     resp = await http_client.get(url)
     if resp.status_code != 200:
         raise HTTPException(502, "News API error")
