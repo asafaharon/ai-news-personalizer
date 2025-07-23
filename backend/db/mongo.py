@@ -12,49 +12,39 @@ if not DATABASE_NAME:
     raise RuntimeError("❌ DATABASE_NAME not set in environment variables")
 # התחברות למסד
 try:
+    # Improved connection settings for MongoDB Atlas
     client = AsyncIOMotorClient(
         MONGODB_URI,
-        serverSelectionTimeoutMS=30000,
-        connectTimeoutMS=30000,
-        socketTimeoutMS=30000
+        serverSelectionTimeoutMS=10000,  # Reduced timeout
+        connectTimeoutMS=10000,
+        socketTimeoutMS=10000,
+        retryWrites=True,
+        w='majority'
     )
     db = client[DATABASE_NAME]
     print(f"✅ Connected to MongoDB database: {DATABASE_NAME}")
+    
+    # Test the connection immediately
+    async def test_connection():
+        try:
+            await client.admin.command('ping')
+            print("✅ MongoDB connection test successful")
+        except Exception as e:
+            print(f"❌ MongoDB connection test failed: {e}")
+    
+    # Note: Connection test will happen when first database operation occurs
+    
 except Exception as e:
     print("❌ MongoDB Atlas connection failed:", e)
-    print("🔄 Attempting local MongoDB connection...")
+    print("🔄 Using fallback configuration...")
+    
+    # Create a simpler connection without some Atlas-specific options
     try:
-        # Fallback to local MongoDB
-        local_uri = "mongodb://localhost:27017"
-        client = AsyncIOMotorClient(local_uri)
+        # Simplified connection for troubleshooting
+        simple_uri = MONGODB_URI.replace('&ssl_cert_reqs=CERT_NONE&tlsInsecure=true', '')
+        client = AsyncIOMotorClient(simple_uri, serverSelectionTimeoutMS=5000)
         db = client[DATABASE_NAME]
-        print(f"✅ Connected to local MongoDB database: {DATABASE_NAME}")
-    except Exception as local_e:
-        print("❌ Local MongoDB connection also failed:", local_e)
-        print("⚠️  Using mock database for development...")
-        # Create a simple in-memory mock for development
-        class MockDB:
-            def __init__(self):
-                self.collections = {}
-            
-            def __getitem__(self, name):
-                if name not in self.collections:
-                    self.collections[name] = MockCollection()
-                return self.collections[name]
-        
-        class MockCollection:
-            def __init__(self):
-                self.data = []
-            
-            async def find_one(self, query):
-                return None  # No users in mock DB
-            
-            async def insert_one(self, doc):
-                self.data.append(doc)
-                return type('InsertResult', (), {'inserted_id': 'mock_id'})()
-                
-            async def find(self, query=None):
-                return self.data
-        
-        db = MockDB()
-        print("📝 Using mock database - login will not work, but app will start")
+        print(f"✅ Connected to MongoDB with simplified configuration: {DATABASE_NAME}")
+    except Exception as e2:
+        print(f"❌ Simplified connection also failed: {e2}")
+        raise RuntimeError("Cannot connect to MongoDB. Please check your connection string and network.")
