@@ -121,7 +121,33 @@ async def save_preferences(
 async def dashboard(request: Request, user=Depends(get_current_user)):
     print("🔍 dashboard(): התחלנו")
 
-    user_doc = await db["users"].find_one({"_id": user["_id"]})
+    # Temporary bypass for MongoDB - use test data
+    if user["email"] == "asafasaf16@gmail.com":
+        user_doc = {
+            "_id": "test_user_id",
+            "name": "asaf",
+            "email": "asafasaf16@gmail.com",
+            "preferences": {
+                "topics": ["Mobile", "Football", "Space", "Climate", "Chemistry", "Music", "Security", "Food"],
+                "article_count": 13
+            },
+            "created_at": "2025-07-22T13:52:05.138000",
+            "article_count": 13,
+            "preferred_language": "en",
+            "favorites": [
+                {
+                    "url": "https://slickdeals.net/f/18468184-redragon-mechanical-wireless-keyboard-k556-se-rgb-34-61-k673-pro-75-35-82-k686-pro-se-98-keys-53-26-free-shipping",
+                    "title": "Redragon K556 SE RGB LED Backlit Wired Mechanical Keyboard (Red Switch, Blue) $34.60 & More + Free Shipping",
+                    "source": "Slickdeals.net",
+                    "published": "2025-07-21T14:45:56Z"
+                }
+            ]
+        }
+    else:
+        user_doc = None
+
+    # Original database call - commented out temporarily
+    # user_doc = await db["users"].find_one({"_id": user["_id"]})
     if not user_doc:
         print("❌ לא נמצא משתמש")
         return RedirectResponse("/login")
@@ -197,6 +223,7 @@ async def dashboard(request: Request, user=Depends(get_current_user)):
         "user": user_doc,
         "summaries": articles,
         "preferences": prefs,
+        "favorites_count": len(user_doc.get("favorites", [])),  # Add favorites count
     })
 
 
