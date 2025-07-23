@@ -119,11 +119,18 @@ async def save_preferences(
 # backend/routers/profile.py
 @router.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request, user=Depends(get_current_user)):
-    print("🔍 dashboard(): התחלנו")
+    try:
+        print("🔍 dashboard(): התחלנו")
+        print(f"🔍 User object: {user}")
 
-    # Temporary bypass for MongoDB - use test data
-    if user["email"] == "asafasaf16@gmail.com":
-        user_doc = {
+        # Check if user has email key
+        if not user or "email" not in user:
+            print("❌ User object missing or no email")
+            return RedirectResponse("/login")
+
+        # Temporary bypass for MongoDB - use test data
+        if user["email"] == "asafasaf16@gmail.com":
+            user_doc = {
             "_id": "test_user_id",
             "name": "asaf",
             "email": "asafasaf16@gmail.com",
@@ -217,14 +224,20 @@ async def dashboard(request: Request, user=Depends(get_current_user)):
             "summary": summary,
         })
 
-    print("✅ מציגים תבנית dashboard")
-    return templates.TemplateResponse("dashboard.html", {
-        "request": request,
-        "user": user_doc,
-        "summaries": articles,
-        "preferences": prefs,
-        "favorites_count": len(user_doc.get("favorites", [])),  # Add favorites count
-    })
+        print("✅ מציגים תבנית dashboard")
+        return templates.TemplateResponse("dashboard.html", {
+            "request": request,
+            "user": user_doc,
+            "summaries": articles,
+            "preferences": prefs,
+            "favorites_count": len(user_doc.get("favorites", [])),  # Add favorites count
+        })
+    
+    except Exception as e:
+        print(f"❌ Dashboard error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Dashboard error: {str(e)}")
 
 
 @router.get("/profile/edit", response_class=HTMLResponse)
