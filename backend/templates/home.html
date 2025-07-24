@@ -8,52 +8,367 @@
   <!-- Tailwind CDN -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
 
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   <!-- Dark-mode before paint -->
   <script>
     if (window.matchMedia('(prefers-color-scheme: dark)').matches)
       document.documentElement.classList.add('dark');
   </script>
 
-  <!-- Subtle animated gradient -->
+  <!-- Enhanced styles -->
   <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    
     .hero-bg {
-      background: linear-gradient(135deg,#65C7F7 0%,#0052D4 100%);
-      animation: gradientShift 6s ease-in-out infinite alternate;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
     }
+    
     @keyframes gradientShift {
-      to { background-position: 200% 0; }
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
-    .glow { text-shadow: 0 0 10px rgba(255,255,255,.6); }
+    
+    .glow { 
+      text-shadow: 0 0 20px rgba(255,255,255,0.3), 0 0 40px rgba(255,255,255,0.1); 
+    }
+    
+    .floating-particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      animation: float 20s infinite linear;
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    .glass-card {
+      backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    .button-primary {
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+      transition: all 0.3s ease;
+    }
+    
+    .button-primary:hover {
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+      transform: translateY(-2px);
+    }
+    
+    .button-secondary {
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+      border: 2px solid rgba(255,255,255,0.3);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+    
+    .button-secondary:hover {
+      background: rgba(255,255,255,0.2);
+      border-color: rgba(255,255,255,0.5);
+      transform: translateY(-2px);
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 640px) {
+      .hero-bg {
+        background-attachment: scroll;
+      }
+      
+      .touch-target {
+        min-height: 44px;
+        min-width: 44px;
+      }
+      
+      body {
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+    }
   </style>
 </head>
 
-<body class="hero-bg bg-fixed bg-cover bg-center min-h-screen flex items-center justify-center text-center text-white">
+<body class="hero-bg min-h-screen text-center text-white relative overflow-x-hidden">
 
-  <!-- Center card -->
-  <div class="backdrop-blur-sm/30 bg-white/10 dark:bg-gray-900/30 p-8 rounded-3xl shadow-2xl max-w-lg w-full">
-    <h1 class="text-4xl md:text-5xl font-extrabold mb-4 glow">
-      AI&nbsp;News Personalizer
-    </h1>
-
-    <p class="text-lg md:text-xl mb-8 tracking-wide leading-relaxed">
-      Get AI-summarized, personalized news<br/>in one click—tailored to your interests.
-    </p>
-
-    <div class="flex flex-col gap-4">
-      <a href="/login"
-         class="rounded-full bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-semibold py-3 transition shadow-lg hover:scale-105">
-        🚀 Log&nbsp;In
-      </a>
-      <a href="/register"
-         class="rounded-full border border-white/70 hover:border-white py-3 font-semibold backdrop-blur-sm transition hover:scale-105">
-        ✨ Sign&nbsp;Up&nbsp;Free
-      </a>
-    </div>
+  <!-- Floating particles background -->
+  <div class="floating-particles">
+    <div class="particle" style="left: 10%; width: 4px; height: 4px; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 20%; width: 6px; height: 6px; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 30%; width: 3px; height: 3px; animation-delay: 4s;"></div>
+    <div class="particle" style="left: 40%; width: 5px; height: 5px; animation-delay: 6s;"></div>
+    <div class="particle" style="left: 50%; width: 4px; height: 4px; animation-delay: 8s;"></div>
+    <div class="particle" style="left: 60%; width: 6px; height: 6px; animation-delay: 10s;"></div>
+    <div class="particle" style="left: 70%; width: 3px; height: 3px; animation-delay: 12s;"></div>
+    <div class="particle" style="left: 80%; width: 5px; height: 5px; animation-delay: 14s;"></div>
+    <div class="particle" style="left: 90%; width: 4px; height: 4px; animation-delay: 16s;"></div>
   </div>
 
-  <!-- Footer credit -->
-  <footer class="absolute bottom-4 text-sm text-white/80 dark:text-white/50 w-full text-center">
-    Built with ❤️ by <a href="https://github.com/asafaharon" target="_blank" class="underline hover:text-yellow-300 font-semibold">Asaf Aharon</a>
+  <!-- Hero Section -->
+  <section class="min-h-screen flex items-center justify-center page-section scroll-anchor" id="hero">
+    <div class="relative z-10 max-w-4xl mx-4 px-4">
+      
+      <!-- Logo/Icon -->
+      <div class="mb-8 flex justify-center scroll-fade-in">
+        <div class="glass-card rounded-3xl p-6 inline-block">
+          <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364-.636l-.707.707M21 12h-1M17.657 17.657l-.707-.707M12 21v-1m-6.364-.636l.707-.707M3 12h1m3.343-5.657l.707.707M8.5 14.5l7-7m0 0l-7 7m7-7v6m0-6H12"></path>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Hero content -->
+      <div class="glass-card rounded-3xl p-8 md:p-12 mb-8 scroll-fade-in">
+      <h1 class="text-5xl md:text-7xl font-black mb-6 glow leading-tight">
+        AI News<br/>
+        <span class="bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent">
+          Personalizer
+        </span>
+      </h1>
+
+      <p class="text-xl md:text-2xl mb-4 font-light leading-relaxed text-white/90">
+        Experience the future of news consumption
+      </p>
+      
+      <p class="text-lg md:text-xl mb-10 leading-relaxed text-white/80 max-w-2xl mx-auto">
+        Get AI-powered, personalized news summaries delivered instantly. 
+        Smart algorithms curate content based on your interests, saving you time while keeping you informed.
+      </p>
+
+      <!-- Action buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto">
+        <a href="/login"
+           class="button-primary w-full sm:w-auto rounded-full text-gray-900 font-bold py-4 px-8 text-lg touch-target flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+          </svg>
+          Sign In
+        </a>
+        <a href="/register"
+           class="button-secondary w-full sm:w-auto rounded-full font-semibold py-4 px-8 text-lg touch-target flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+          </svg>
+          Get Started Free
+        </a>
+      </div>
+    </div>
+
+      <!-- Features grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 scroll-fade-in">
+      <div class="glass-card rounded-2xl p-6 text-center">
+        <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+        </div>
+        <h3 class="font-bold text-lg mb-2">Lightning Fast</h3>
+        <p class="text-white/70 text-sm">Get your personalized feed in seconds, not minutes</p>
+      </div>
+      
+      <div class="glass-card rounded-2xl p-6 text-center">
+        <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-r from-green-400 to-green-600 flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364-.636l-.707.707M21 12h-1M17.657 17.657l-.707-.707M12 21v-1m-6.364-.636l.707-.707M3 12h1m3.343-5.657l.707.707"></path>
+          </svg>
+        </div>
+        <h3 class="font-bold text-lg mb-2">AI-Powered</h3>
+        <p class="text-white/70 text-sm">Advanced algorithms learn your preferences and interests</p>
+      </div>
+      
+      <div class="glass-card rounded-2xl p-6 text-center">
+        <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-r from-purple-400 to-purple-600 flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+          </svg>
+        </div>
+        <h3 class="font-bold text-lg mb-2">Personalized</h3>
+        <p class="text-white/70 text-sm">Content tailored specifically to your reading preferences</p>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- Additional Features Section -->
+  <section class="page-section scroll-anchor py-20" id="features">
+    <div class="relative z-10 max-w-6xl mx-4 px-4">
+      <div class="text-center mb-16 scroll-fade-in">
+        <h2 class="text-4xl md:text-5xl font-bold mb-6 glow">
+          Why Choose AI News?
+        </h2>
+        <p class="text-xl text-white/80 max-w-3xl mx-auto">
+          Experience news consumption like never before with our cutting-edge AI technology
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="glass-card rounded-2xl p-8 text-center scroll-fade-in">
+          <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-green-400 to-emerald-500 flex items-center justify-center">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364-.636l-.707.707M21 12h-1M17.657 17.657l-.707-.707M12 21v-1m-6.364-.636l.707-.707M3 12h1m3.343-5.657l.707.707"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-4">Smart Summaries</h3>
+          <p class="text-white/70">AI-generated summaries that capture the essence of every article</p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-8 text-center scroll-fade-in">
+          <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-blue-400 to-cyan-500 flex items-center justify-center">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-4">Custom Filters</h3>
+          <p class="text-white/70">Filter news by topics, sources, and reading time preferences</p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-8 text-center scroll-fade-in">
+          <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-4">Save & Organize</h3>
+          <p class="text-white/70">Bookmark articles and organize them into personal collections</p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-8 text-center scroll-fade-in">
+          <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-r from-orange-400 to-red-500 flex items-center justify-center">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold mb-4">Real-time Updates</h3>
+          <p class="text-white/70">Stay updated with the latest news as it happens, 24/7</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="relative z-10 py-12 border-t border-white/20">
+    <div class="max-w-4xl mx-4 px-4 text-center">
+      <div class="mb-8 scroll-fade-in">
+        <h3 class="text-2xl font-bold mb-4">Ready to get started?</h3>
+        <p class="text-white/80 mb-6">Join thousands of users who are already enjoying personalized news</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="/register" class="button-primary rounded-full px-8 py-4 font-bold text-gray-900">
+            Start Free Today
+          </a>
+          <a href="/login" class="button-secondary rounded-full px-8 py-4 font-semibold">
+            Sign In
+          </a>
+        </div>
+      </div>
+      
+      <div class="text-sm text-white/60 scroll-fade-in">
+        Built with ❤️ by <a href="https://github.com/asafaharon" target="_blank" class="underline hover:text-yellow-300 font-semibold">Asaf Aharon</a>
+      </div>
+    </div>
   </footer>
+
+  <!-- Scroll Progress Bar -->
+  <div id="scrollProgress" class="scroll-progress"></div>
+
+  <!-- Floating Scroll Actions -->
+  <div class="floating-scroll-actions">
+    <button id="scrollToTop" class="scroll-to-top" aria-label="Scroll to top" title="Back to top">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Enhanced Scroll JavaScript -->
+  <script>
+    // Enhanced Scroll Functionality
+    const scrollToTopBtn = document.getElementById('scrollToTop');
+    const scrollProgress = document.getElementById('scrollProgress');
+    
+    // Scroll progress and scroll-to-top functionality
+    window.addEventListener('scroll', function() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrollPercentage = (scrollTop / scrollHeight) * 100;
+      
+      // Update progress bar
+      if (scrollProgress) {
+        scrollProgress.style.width = scrollPercentage + '%';
+      }
+      
+      // Show/hide scroll to top button
+      if (scrollTop > 300) {
+        scrollToTopBtn.classList.add('visible');
+      } else {
+        scrollToTopBtn.classList.remove('visible');
+      }
+      
+      // Animate elements on scroll (fade in effect)
+      const fadeInElements = document.querySelectorAll('.scroll-fade-in');
+      fadeInElements.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+        const elementVisible = 150;
+        
+        if (elementTop < window.innerHeight - elementVisible) {
+          element.classList.add('visible');
+        }
+      });
+    });
+    
+    scrollToTopBtn.addEventListener('click', function() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
+    });
+  </script>
 </body>
 </html>
+

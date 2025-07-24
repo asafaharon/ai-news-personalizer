@@ -110,7 +110,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
           <!-- Technology -->
-          <div class="topic-category border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300">
+          <div class="topic-category border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 scroll-fade-in">
             <div class="flex items-center mb-4">
               <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-400 to-cyan-500 flex items-center justify-center mr-3">
                 <span class="text-sm">🧠</span>
@@ -334,12 +334,18 @@
   <!-- Toast Container -->
   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2 safe-area-inset-right"></div>
 
-  <!-- Scroll to Top Button -->
-  <button id="scrollToTop" class="scroll-to-top" aria-label="Scroll to top">
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-    </svg>
-  </button>
+  <!-- Scroll Progress Bar -->
+  <div id="scrollProgress" class="scroll-progress"></div>
+
+  <!-- Floating Scroll Actions -->
+  <div class="floating-scroll-actions">
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTop" class="scroll-to-top" aria-label="Scroll to top" title="Back to top">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+      </svg>
+    </button>
+  </div>
 
   <!-- JavaScript -->
   <script>
@@ -441,15 +447,38 @@
       }, 5000);
     }
 
-    // Scroll to Top Functionality
+    // Enhanced Scroll Functionality
     const scrollToTopBtn = document.getElementById('scrollToTop');
+    const scrollProgress = document.getElementById('scrollProgress');
     
+    // Scroll progress and scroll-to-top functionality
     window.addEventListener('scroll', function() {
-      if (window.pageYOffset > 300) {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrollPercentage = (scrollTop / scrollHeight) * 100;
+      
+      // Update progress bar
+      if (scrollProgress) {
+        scrollProgress.style.width = scrollPercentage + '%';
+      }
+      
+      // Show/hide scroll to top button
+      if (scrollTop > 300) {
         scrollToTopBtn.classList.add('visible');
       } else {
         scrollToTopBtn.classList.remove('visible');
       }
+      
+      // Animate elements on scroll (fade in effect)
+      const fadeInElements = document.querySelectorAll('.scroll-fade-in');
+      fadeInElements.forEach(element => {
+        const elementTop = element.getBoundingClientRect().top;
+        const elementVisible = 150;
+        
+        if (elementTop < window.innerHeight - elementVisible) {
+          element.classList.add('visible');
+        }
+      });
     });
     
     scrollToTopBtn.addEventListener('click', function() {

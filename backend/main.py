@@ -28,8 +28,28 @@ app.include_router(news.router)
 app.include_router(favorites.router)
 
 @app.get("/loading", response_class=HTMLResponse)
-async def loading(request: Request):
-    return templates.TemplateResponse("loading.html", {"request": request})
+async def loading(request: Request, article_count: int = 10, topics: str = ""):
+    # Calculate estimated loading time based on content
+    topic_list = topics.split(",") if topics else []
+    
+    # Base loading time: 3 seconds
+    estimated_time = 3000
+    
+    # Add time based on article count (100ms per article)
+    estimated_time += article_count * 100
+    
+    # Add time based on number of topics (200ms per topic for API calls)
+    estimated_time += len(topic_list) * 200
+    
+    # Cap the maximum loading time at 12 seconds
+    estimated_time = min(estimated_time, 12000)
+    
+    return templates.TemplateResponse("loading.html", {
+        "request": request,
+        "estimated_time": estimated_time,
+        "article_count": article_count,
+        "topic_count": len(topic_list)
+    })
 
 
 # ✅ נתיב הבית הראשי

@@ -29,12 +29,20 @@
 
   <!-- Loading Logic -->
   <script>
-    // Enhanced loading with progress tracking
+    // Enhanced loading with dynamic progress tracking
     let progress = 0;
+    
+    // Get loading parameters from backend
+    const estimatedTime = {{ estimated_time|default(6000) }};
+    const articleCount = {{ article_count|default(10) }};
+    const topicCount = {{ topic_count|default(1) }};
+    
+    // Dynamic loading messages based on content
     let loadingMessages = [
       "Analyzing your preferences...",
-      "Fetching latest news articles...", 
+      `Fetching ${articleCount} latest news articles...`, 
       "AI is personalizing your feed...",
+      `Processing ${topicCount} topic${topicCount !== 1 ? 's' : ''}...`,
       "Organizing articles by relevance...",
       "Almost ready, finalizing your dashboard..."
     ];
@@ -46,25 +54,21 @@
       const progressText = document.getElementById('progressText');
       
       if (progressBar && loadingMessage && progressText) {
-        progress += Math.random() * 15 + 5; // Increment by 5-20%
+        // Calculate dynamic progress increment based on estimated time
+        const baseIncrement = 100 / (estimatedTime / 800); // Target completion in estimatedTime
+        progress += Math.random() * baseIncrement * 0.5 + baseIncrement * 0.5;
         
         if (progress > 100) progress = 100;
         
         progressBar.style.width = progress + '%';
         progressText.textContent = Math.round(progress) + '%';
         
-        // Update message based on progress
-        if (progress > 20 && currentMessageIndex === 0) {
-          currentMessageIndex = 1;
-          loadingMessage.textContent = loadingMessages[currentMessageIndex];
-        } else if (progress > 40 && currentMessageIndex === 1) {
-          currentMessageIndex = 2;
-          loadingMessage.textContent = loadingMessages[currentMessageIndex];
-        } else if (progress > 60 && currentMessageIndex === 2) {
-          currentMessageIndex = 3;
-          loadingMessage.textContent = loadingMessages[currentMessageIndex];
-        } else if (progress > 80 && currentMessageIndex === 3) {
-          currentMessageIndex = 4;
+        // Update message based on progress (dynamic message count)
+        const messageThreshold = 100 / loadingMessages.length;
+        const expectedMessageIndex = Math.floor(progress / messageThreshold);
+        
+        if (expectedMessageIndex < loadingMessages.length && expectedMessageIndex > currentMessageIndex) {
+          currentMessageIndex = expectedMessageIndex;
           loadingMessage.textContent = loadingMessages[currentMessageIndex];
         }
         
@@ -84,20 +88,21 @@
         loadingMessage.textContent = loadingMessages[0];
       }
       
-      // Update progress every 300-800ms for realistic feel
+      // Dynamic update interval based on estimated time
+      const updateInterval = Math.max(300, estimatedTime / 15); // 15 updates over estimated time, minimum 300ms
       const progressInterval = setInterval(() => {
         updateProgress();
         if (progress >= 100) {
           clearInterval(progressInterval);
         }
-      }, Math.random() * 500 + 300);
+      }, updateInterval);
       
-      // Backup redirect after 10 seconds
+      // Backup redirect after estimated time + 3 seconds buffer
       setTimeout(() => {
         if (progress < 100) {
           window.location.href = "/dashboard";
         }
-      }, 10000);
+      }, estimatedTime + 3000);
     });
   </script>
 </head>
@@ -213,7 +218,7 @@
     </div>
 
     <!-- Loading Tips -->
-    <div class="text-center text-white/80 animate-fade-in" style="animation-delay: 1.3s;">
+    <div class="text-center text-white/80 animate c-fade-in" style="animation-delay: 1.3s;">
       <p class="text-sm mb-4">💡 <strong>Pro Tip:</strong> Customize your preferences anytime from your dashboard</p>
       <div class="flex items-center justify-center space-x-4 text-xs">
         <span class="flex items-center">

@@ -28,7 +28,7 @@
   </script>
 </head>
 
-<body class="min-h-screen hero-gradient flex items-center justify-center p-4 relative">
+<body class="min-h-screen hero-gradient p-4 relative safe-area-inset-top safe-area-inset-bottom">
   
   <!-- Background Pattern -->
   <div class="absolute inset-0 opacity-10">
@@ -39,7 +39,7 @@
   <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
   <!-- Main Content -->
-  <div class="relative z-10 w-full max-w-md">
+  <div class="relative z-10 w-full max-w-md mx-auto py-8 md:py-16">
     
     <!-- Error message -->
     {% if error %}
@@ -54,7 +54,7 @@
     {% endif %}
 
     <!-- Registration Card -->
-    <div class="card backdrop-blur p-8 bg-white/90 dark:bg-gray-800/90 animate-fade-in">
+    <div class="card backdrop-blur p-6 md:p-8 bg-white/90 dark:bg-gray-800/90 animate-fade-in">
       
       <!-- Header -->
       <div class="text-center mb-8">
@@ -83,7 +83,7 @@
               required
               placeholder="Enter your full name"
               autocomplete="name"
-              class="form-input focus-ring pl-10" 
+              class="form-input focus-ring pl-10 touch-target" 
             />
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,7 +106,7 @@
               required
               placeholder="Enter your email"
               autocomplete="email"
-              class="form-input focus-ring pl-10" 
+              class="form-input focus-ring pl-10 touch-target" 
             />
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -129,14 +129,14 @@
               required
               placeholder="Create a strong password"
               autocomplete="new-password"
-              class="form-input focus-ring pl-10 pr-10"
+              class="form-input focus-ring pl-10 pr-10 touch-target"
             />
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
-            <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+            <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center touch-target">
               <svg id="eyeOpen" class="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -164,7 +164,7 @@
             id="terms" 
             type="checkbox" 
             required
-            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded touch-target"
           />
           <label for="terms" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
             I agree to the <a href="#" class="text-blue-600 hover:underline">Terms of Service</a> and <a href="#" class="text-blue-600 hover:underline">Privacy Policy</a>
@@ -175,7 +175,7 @@
         <button 
           type="submit" 
           id="submitBtn"
-          class="btn btn-primary w-full py-3 text-base font-semibold focus-ring bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700"
+          class="btn btn-primary w-full py-3 text-base font-semibold focus-ring bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 touch-target"
         >
           <span id="buttonText">Create Account</span>
           <div id="buttonSpinner" class="spinner hidden"></div>
@@ -197,7 +197,7 @@
 
       <!-- Sign In Link -->
       <div class="mt-6 text-center">
-        <a href="/login" class="btn btn-secondary w-full py-3 text-base interactive">
+        <a href="/login" class="btn btn-secondary w-full py-3 text-base interactive touch-target">
           Sign in instead
         </a>
       </div>
@@ -233,6 +233,77 @@
     </div>
 
   </div>
+
+  <!-- Getting Started Section -->
+  <section class="relative z-10 py-12 mt-16">
+    <div class="max-w-2xl mx-auto px-4 text-center">
+      <div class="glass-card rounded-2xl p-8 mb-8 scroll-fade-in">
+        <h2 class="text-2xl font-bold text-white mb-6">What happens after you sign up?</h2>
+        <div class="space-y-6 text-left">
+          <div class="flex items-start space-x-4">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">
+              1
+            </div>
+            <div>
+              <h3 class="font-semibold text-white mb-1">Choose Your Interests</h3>
+              <p class="text-white/70 text-sm">Select from dozens of topics like Technology, Sports, Science, and more</p>
+            </div>
+          </div>
+          <div class="flex items-start space-x-4">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">
+              2
+            </div>
+            <div>
+              <h3 class="font-semibold text-white mb-1">AI Creates Your Feed</h3>
+              <p class="text-white/70 text-sm">Our smart algorithms curate personalized news summaries just for you</p>
+            </div>
+          </div>
+          <div class="flex items-start space-x-4">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">
+              3
+            </div>
+            <div>
+              <h3 class="font-semibold text-white mb-1">Start Reading</h3>
+              <p class="text-white/70 text-sm">Enjoy bite-sized, AI-summarized articles that save you time</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="glass-card rounded-2xl p-6 mb-8 scroll-fade-in">
+        <h3 class="text-lg font-bold text-white mb-4">Trusted by thousands</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div>
+            <div class="text-2xl font-bold text-white">10K+</div>
+            <div class="text-xs text-white/60">Active Users</div>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-white">50K+</div>
+            <div class="text-xs text-white/60">Articles Read</div>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-white">99%</div>
+            <div class="text-xs text-white/60">Satisfaction</div>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-white">24/7</div>
+            <div class="text-xs text-white/60">Support</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="text-center scroll-fade-in">
+        <p class="text-white/60 text-sm mb-4">
+          Already have an account? <a href="/login" class="text-yellow-300 hover:text-yellow-200 font-semibold">Sign in here</a>
+        </p>
+        <div class="flex justify-center space-x-4 text-xs text-white/50">
+          <span>🚀 Free Forever</span>
+          <span>🔒 Privacy First</span>
+          <span>⚡ Instant Setup</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- JavaScript -->
   <script>
@@ -298,8 +369,85 @@
       buttonSpinner.classList.remove('hidden');
     });
 
-    // Auto-focus first input
-    document.getElementById('name').focus();
+    // Auto-focus first input (desktop only)
+    if (window.innerWidth > 768) {
+      document.getElementById('name').focus();
+    }
+    
+    // Prevent zoom on input focus (iOS)
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(input => {
+      input.addEventListener('focus', function() {
+        if (window.innerWidth <= 768) {
+          document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1');
+        }
+      });
+      
+      input.addEventListener('blur', function() {
+        if (window.innerWidth <= 768) {
+          document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=device-width, initial-scale=1.0');
+        }
+      });
+    });
+
+    // Basic scroll functionality for forms
+    window.addEventListener('scroll', function() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      
+      // Smooth scroll behavior is handled by CSS
+      if (scrollTop > 50) {
+        document.body.classList.add('scrolled');
+      } else {
+        document.body.classList.remove('scrolled');
+      }
+    });
+  </script>
+
+  <!-- Scroll Progress Bar -->
+  <div id="scrollProgress" class="scroll-progress"></div>
+
+  <!-- Floating Scroll Actions -->
+  <div class="floating-scroll-actions">
+    <button id="scrollToTop" class="scroll-to-top" aria-label="Scroll to top" title="Back to top">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Enhanced Scroll JavaScript -->
+  <script>
+    // Enhanced Scroll Functionality
+    const scrollToTopBtn = document.getElementById('scrollToTop');
+    const scrollProgress = document.getElementById('scrollProgress');
+    
+    // Scroll progress and scroll-to-top functionality
+    window.addEventListener('scroll', function() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrollPercentage = (scrollTop / scrollHeight) * 100;
+      
+      // Update progress bar
+      if (scrollProgress) {
+        scrollProgress.style.width = scrollPercentage + '%';
+      }
+      
+      // Show/hide scroll to top button
+      if (scrollTop > 200) {
+        scrollToTopBtn.classList.add('visible');
+      } else {
+        scrollToTopBtn.classList.remove('visible');
+      }
+    });
+    
+    if (scrollToTopBtn) {
+      scrollToTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    }
   </script>
 
 </body>

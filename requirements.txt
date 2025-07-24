@@ -1,7 +1,6 @@
 passlib[bcrypt]==1.7.4
 bcrypt==3.2.2
 
-# שאר הספריות...
 fastapi~=0.115.12
 uvicorn[standard]~=0.34.3
 pydantic~=2.11.5

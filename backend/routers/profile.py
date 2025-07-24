@@ -61,7 +61,7 @@ def get_openai_summary(text: str, lang: str = "en") -> str:
             
         return summary
     except Exception as e:
-        print(f"❌ OpenAI Error: {e}")
+        print(f"[ERROR] OpenAI Error: {e}")
         return "Summary unavailable - visit article for full details"
 
 
@@ -110,121 +110,99 @@ async def save_preferences(
                 "topics": topics,
                 "article_count": article_count,
             },
-            "preferred_language": "en",     # <- קבוע
+            "preferred_language": "en",
             "article_count": article_count,
         }},
     )
 
-    return RedirectResponse("/loading", status_code=302)
+    # Build loading URL with parameters based on user preferences
+    topics_str = ",".join(topics) if topics else ""
+    loading_url = f"/loading?article_count={article_count}&topics={topics_str}"
+    return RedirectResponse(loading_url, status_code=302)
 # backend/routers/profile.py
 @router.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request, user=Depends(get_current_user)):
     try:
-        print("🔍 dashboard(): התחלנו")
-        print(f"🔍 User object: {user}")
+        print("[DEBUG] Dashboard function started")
+        print(f"[DEBUG] User object: {user}")
 
         # Check if user has email key
         if not user or "email" not in user:
-            print("❌ User object missing or no email")
+            print("[ERROR] User object missing or no email")
             return RedirectResponse("/login")
 
-        # Temporary bypass for MongoDB - use test data
-        if user["email"] == "asafasaf16@gmail.com":
-            user_doc = {
-            "_id": "test_user_id",
-            "name": "asaf",
-            "email": "asafasaf16@gmail.com",
-            "preferences": {
-                "topics": ["Mobile", "Football", "Space", "Climate", "Chemistry", "Music", "Security", "Food"],
-                "article_count": 13
-            },
-            "created_at": "2025-07-22T13:52:05.138000",
-            "article_count": 13,
-            "preferred_language": "en",
-            "favorites": [
-                {
-                    "url": "https://slickdeals.net/f/18468184-redragon-mechanical-wireless-keyboard-k556-se-rgb-34-61-k673-pro-75-35-82-k686-pro-se-98-keys-53-26-free-shipping",
-                    "title": "Redragon K556 SE RGB LED Backlit Wired Mechanical Keyboard (Red Switch, Blue) $34.60 & More + Free Shipping",
-                    "source": "Slickdeals.net",
-                    "published": "2025-07-21T14:45:56Z"
-                }
-            ]
+        # Get user document from database
+        user_doc = await db["users"].find_one({"_id": user["_id"]})
+        if not user_doc:
+            print("[ERROR] User not found in database")
+            return RedirectResponse("/login")
+
+        print("[DEBUG] user_doc:", user_doc)
+
+        prefs = user_doc.get("preferences", {})
+        if not prefs or not prefs.get("topics"):
+            print("[WARNING] No preferences saved")
+            return RedirectResponse("/profile")
+
+        query = " OR ".join(prefs["topics"])
+        page_size = int(prefs.get("article_count", 10))
+
+        if not NEWS_API_KEY:
+            print("[ERROR] Missing NEWS_API_KEY")
+            raise HTTPException(500, detail="Missing NEWS_API_KEY")
+
+        # NewsData.io API parameters
+        params = {
+            "q": query,
+            "apikey": NEWS_API_KEY,  # NewsData.io uses 'apikey' not 'apiKey'
+            "language": "en",
+            "size": min(page_size, 10),  # NewsData.io uses 'size' not 'pageSize', max 10 for free tier
         }
-    else:
-        user_doc = None
 
-    # Original database call - commented out temporarily
-    # user_doc = await db["users"].find_one({"_id": user["_id"]})
-    if not user_doc:
-        print("❌ לא נמצא משתמש")
-        return RedirectResponse("/login")
-
-    print("👤 user_doc:", user_doc)
-
-    prefs = user_doc.get("preferences", {})
-    if not prefs or not prefs.get("topics"):
-        print("⚠️ אין העדפות שמורות")
-        return RedirectResponse("/profile")
-
-    query = " OR ".join(prefs["topics"])
-    page_size = int(prefs.get("article_count", 10))
-
-    if not NEWS_API_KEY:
-        print("❌ חסר NEWS_API_KEY")
-        raise HTTPException(500, detail="Missing NEWS_API_KEY")
-
-    # NewsData.io API parameters
-    params = {
-        "q": query,
-        "apikey": NEWS_API_KEY,  # NewsData.io uses 'apikey' not 'apiKey'
-        "language": "en",
-        "size": min(page_size, 10),  # NewsData.io uses 'size' not 'pageSize', max 10 for free tier
-    }
-
-    try:
-        resp = requests.get(NEWS_API_URL, params=params, timeout=10)
-        resp.raise_for_status()
-        data = resp.json()
-    except Exception as e:
-        print("❌ שגיאה ב-NewsAPI:", e)
-        raise HTTPException(502, detail=f"News API error: {str(e)}")
-
-    articles = []
-    # NewsData.io returns results in 'results' field, not 'articles'
-    for a in data.get("results", []):
-        # Get the best available text content
-        title = a.get("title", "")
-        description = a.get("description", "")
-        content = a.get("content", "")
-        
-        # Combine available text, prioritizing description over content for free tier
-        full_text = ""
-        if description and len(description) > 50:
-            full_text = f"{title}. {description}"
-        elif content and len(content) > 50:
-            full_text = f"{title}. {content}"
-        else:
-            full_text = title
-            
-        # Generate summary
         try:
-            if len(full_text) > 30:  # Only summarize if we have enough content
-                summary = get_openai_summary(full_text)
-            else:
-                summary = "Limited content available - visit link for full article"
+            resp = requests.get(NEWS_API_URL, params=params, timeout=10)
+            resp.raise_for_status()
+            data = resp.json()
         except Exception as e:
-            print("❌ שגיאה בתקציר עם OpenAI:", e)
-            summary = description[:200] + "..." if description else "Summary not available"
+            print("[ERROR] NewsAPI error:", e)
+            raise HTTPException(502, detail=f"News API error: {str(e)}")
 
-        articles.append({
-            "title": title,
-            "source": a.get("source_id", "Unknown"),  # NewsData.io uses 'source_id'
-            "published": a.get("pubDate", ""),  # NewsData.io uses 'pubDate'
-            "url": a.get("link", "#"),  # NewsData.io uses 'link'
-            "summary": summary,
-        })
+        articles = []
+        # NewsData.io returns results in 'results' field, not 'articles'
+        for a in data.get("results", []):
+            # Get the best available text content
+            title = a.get("title", "")
+            description = a.get("description", "")
+            content = a.get("content", "")
+            
+            # Combine available text, prioritizing description over content for free tier
+            full_text = ""
+            if description and len(description) > 50:
+                full_text = f"{title}. {description}"
+            elif content and len(content) > 50:
+                full_text = f"{title}. {content}"
+            else:
+                full_text = title
+                
+            # Generate summary
+            try:
+                if len(full_text) > 30:  # Only summarize if we have enough content
+                    summary = get_openai_summary(full_text)
+                else:
+                    summary = "Limited content available - visit link for full article"
+            except Exception as e:
+                print("[ERROR] OpenAI summary error:", e)
+                summary = description[:200] + "..." if description else "Summary not available"
 
-        print("✅ מציגים תבנית dashboard")
+            articles.append({
+                "title": title,
+                "source": a.get("source_id", "Unknown"),  # NewsData.io uses 'source_id'
+                "published": a.get("pubDate", ""),  # NewsData.io uses 'pubDate'
+                "url": a.get("link", "#"),  # NewsData.io uses 'link'
+                "summary": summary,
+            })
+
+        print("[OK] Rendering dashboard template")
         return templates.TemplateResponse("dashboard.html", {
             "request": request,
             "user": user_doc,
@@ -234,7 +212,7 @@ async def dashboard(request: Request, user=Depends(get_current_user)):
         })
     
     except Exception as e:
-        print(f"❌ Dashboard error: {e}")
+        print(f"[ERROR] Dashboard error: {e}")
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Dashboard error: {str(e)}")
