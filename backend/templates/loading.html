@@ -264,6 +264,26 @@
       100% { opacity: 1; }
     }
     
+    /* Enhanced loading animations */
+    .smooth-transition {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .fade-in {
+      animation: fadeInSmooth 0.8s ease-out;
+    }
+    
+    @keyframes fadeInSmooth {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
     /* Mobile responsive */
     @media (max-width: 768px) {
       .floating-circle {
@@ -277,6 +297,14 @@
       
       .loading-icon {
         font-size: 3rem;
+      }
+      
+      .title-glow {
+        font-size: 1.75rem;
+      }
+      
+      .loading-message {
+        font-size: 1rem;
       }
     }
   </style>
@@ -344,7 +372,7 @@
   </script>
 </head>
 
-<body class="hero-bg">
+<body class="hero-bg fade-in">
   <!-- Floating background elements -->
   <div class="floating-elements">
     <div class="floating-circle"></div>

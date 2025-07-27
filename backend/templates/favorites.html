@@ -326,6 +326,46 @@
       to { opacity: 1; }
     }
     
+    /* Navigation improvements */
+    .nav-back-button {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #4B5563;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      animation: slideInLeft 0.8s ease-out;
+    }
+    
+    .nav-back-button:hover {
+      transform: translateX(-3px) scale(1.05);
+      background: rgba(255, 255, 255, 1);
+      color: #667eea;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
     /* Mobile responsive */
     @media (max-width: 768px) {
       .floating-circle {
@@ -334,6 +374,7 @@
       
       .main-content {
         padding: 1rem 0;
+        padding-top: 80px; /* Account for fixed nav button */
       }
       
       .nav-links {
@@ -343,6 +384,23 @@
       .mobile-menu {
         display: block;
       }
+      
+      .nav-back-button {
+        width: 44px;
+        height: 44px;
+        top: 0.75rem;
+        left: 0.75rem;
+      }
+      
+      .card {
+        margin: 0 1rem 2rem 1rem;
+        padding: 1.5rem;
+      }
+      
+      .favorite-item {
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
     }
     
     @media (min-width: 769px) {
@@ -350,10 +408,33 @@
         display: none;
       }
     }
+    
+    /* Page transition effects */
+    .page-transition {
+      animation: pageSlideIn 0.6s ease-out;
+    }
+    
+    @keyframes pageSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 
-<body class="hero-bg">
+<body class="hero-bg page-transition">
+  <!-- Navigation Back Button -->
+  <a href="/dashboard" class="nav-back-button" title="Back to Dashboard">
+    <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+    </svg>
+  </a>
+
   <!-- Floating background elements -->
   <div class="floating-elements">
     <div class="floating-circle"></div>

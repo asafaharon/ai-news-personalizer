@@ -446,6 +446,79 @@
       .stats-card {
         padding: 1.5rem;
       }
+      
+      /* Mobile navigation improvements */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+      }
+      
+      body {
+        padding-top: 80px;
+      }
+      
+      /* Better touch targets for mobile */
+      .touch-manipulation {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+      
+      /* Improve mobile menu visibility */
+      #mobileNavMenu {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      
+      /* Mobile-first button styling */
+      .btn {
+        min-height: 44px;
+        padding: 0.75rem 1.5rem;
+      }
+      
+      /* Better mobile typography */
+      .title-glow {
+        font-size: 1.125rem;
+      }
+      
+      .hidden.md\\:block {
+        display: none !important;
+      }
+      
+      /* Mobile menu overlay */
+      #mobileNavMenu.translate-y-0::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.1);
+        z-index: -1;
+      }
+    }
+    
+    /* Enhanced mobile support */
+    @media (max-width: 480px) {
+      .card {
+        margin: 0 0.5rem 1.5rem 0.5rem;
+        padding: 1rem;
+      }
+      
+      .stats-card {
+        padding: 1rem;
+      }
+      
+      .news-card {
+        padding: 1rem !important;
+      }
+      
+      .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
     }
   </style>
 </head>
@@ -469,11 +542,11 @@
           <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center icon-bounce">
             <span class="text-xl">🤖</span>
           </div>
-          <div class="hidden md:block">
-            <h1 class="text-xl font-bold text-gray-800 title-glow">
-              <span class="icon-bounce">👋</span> Welcome back, {{ user.name.split()[0] }}!
+          <div class="flex-1 min-w-0">
+            <h1 class="text-lg md:text-xl font-bold text-gray-800 title-glow truncate">
+              <span class="icon-bounce hidden sm:inline">👋</span> Welcome, {{ user.name.split()[0] }}!
             </h1>
-            <p class="text-sm text-gray-600">Your personalized news dashboard</p>
+            <p class="text-xs md:text-sm text-gray-600 hidden sm:block">Your personalized news dashboard</p>
           </div>
         </div>
 
@@ -482,11 +555,11 @@
         <div class="flex items-center space-x-2 md:space-x-4">
           
           <!-- Mobile Menu Button -->
-          <button id="mobileMenuToggle" class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors touch-target">
-            <svg id="menuIcon" class="w-6 h-6 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button id="mobileMenuToggle" class="md:hidden p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center touch-manipulation">
+            <svg id="menuIcon" class="w-6 h-6 text-gray-500 dark:text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
-            <svg id="closeIcon" class="w-6 h-6 text-gray-500 dark:text-gray-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg id="closeIcon" class="w-6 h-6 text-gray-500 dark:text-gray-400 hidden transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -547,35 +620,35 @@
   </header>
   
   <!-- Mobile Navigation Menu -->
-  <div id="mobileNavMenu" class="md:hidden fixed top-16 inset-x-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-lg hidden safe-area-inset-left safe-area-inset-right">
-    <div class="container-responsive py-4">
+  <div id="mobileNavMenu" class="md:hidden fixed top-16 inset-x-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-lg transform -translate-y-full transition-transform duration-300 ease-in-out safe-area-inset-left safe-area-inset-right">
+    <div class="px-4 py-4">
       <!-- Mobile Navigation Links -->
       <div class="space-y-2">
-        <a href="/profile/edit" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors touch-target">
+        <a href="/profile/edit" class="flex items-center space-x-3 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors min-h-[48px] touch-manipulation">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
           </svg>
-          <span>Edit Profile</span>
+          <span class="font-medium">Edit Profile</span>
         </a>
-        <a href="/profile" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors touch-target">
+        <a href="/profile" class="flex items-center space-x-3 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors min-h-[48px] touch-manipulation">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          <span>Update Preferences</span>
+          <span class="font-medium">Update Preferences</span>
         </a>
-        <a href="/favorites" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors touch-target">
+        <a href="/favorites" class="flex items-center space-x-3 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors min-h-[48px] touch-manipulation">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
-          <span>Recommended</span>
+          <span class="font-medium">Saved Articles</span>
         </a>
-        <div class="border-t border-gray-200 dark:border-gray-600 my-2"></div>
-        <a href="/logout" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 transition-colors touch-target">
+        <div class="border-t border-gray-200 dark:border-gray-600 my-3"></div>
+        <a href="/logout" class="flex items-center space-x-3 p-4 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 transition-colors min-h-[48px] touch-manipulation">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
-          <span>Sign Out</span>
+          <span class="font-medium">Sign Out</span>
         </a>
       </div>
     </div>
@@ -856,15 +929,26 @@
       });
     }
 
-    // Toast Notification System
-    function showToast(message, type = 'info') {
+    // Enhanced Toast Notification System
+    window.showToast = function(message, type = 'info', duration = 5000) {
       const toastContainer = document.getElementById('toast-container');
       const toast = document.createElement('div');
-      toast.className = `toast toast-${type} animate-fade-in`;
+      
+      const typeStyles = {
+        success: 'bg-green-500 text-white',
+        error: 'bg-red-500 text-white',
+        warning: 'bg-yellow-500 text-black',
+        info: 'bg-blue-500 text-white'
+      };
+      
+      toast.className = `toast ${typeStyles[type] || typeStyles.info} animate-fade-in`;
       toast.innerHTML = `
         <div class="flex items-center justify-between">
-          <span>${message}</span>
-          <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+          <div class="flex items-center">
+            <span class="mr-2">${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}</span>
+            <span>${message}</span>
+          </div>
+          <button onclick="this.parentElement.parentElement.remove()" class="ml-4 hover:opacity-70 transition-opacity">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -874,12 +958,36 @@
       
       toastContainer.appendChild(toast);
       
-      // Auto remove after 5 seconds
+      // Auto remove after specified duration
       setTimeout(() => {
         if (toast.parentNode) {
-          toast.remove();
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateX(100%)';
+          setTimeout(() => toast.remove(), 300);
         }
-      }, 5000);
+      }, duration);
+    }
+    
+    // Global error handling
+    window.addEventListener('error', function(e) {
+      showToast('Something went wrong. Please try again.', 'error');
+    });
+    
+    // Enhanced form submission with loading states
+    window.handleFormSubmission = function(form, loadingText = 'Processing...') {
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      
+      submitBtn.disabled = true;
+      submitBtn.textContent = loadingText;
+      submitBtn.style.opacity = '0.7';
+      
+      // Reset button after 10 seconds as fallback
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        submitBtn.style.opacity = '1';
+      }, 10000);
     }
 
     // Hide loading skeleton and show articles
@@ -911,32 +1019,93 @@
     // Mobile Navigation Menu Toggle
     const mobileMenuToggle = document.getElementById('mobileMenuToggle');
     const mobileNavMenu = document.getElementById('mobileNavMenu');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
     
     if (mobileMenuToggle && mobileNavMenu) {
-      mobileMenuToggle.addEventListener('click', function() {
-        mobileNavMenu.classList.toggle('open');
+      let isMenuOpen = false;
+      
+      mobileMenuToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         
-        // Animate hamburger menu
-        const spans = mobileMenuToggle.querySelectorAll('span');
-        if (mobileNavMenu.classList.contains('open')) {
-          spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
-          spans[1].style.opacity = '0';
-          spans[2].style.transform = 'rotate(-45deg) translate(7px, -6px)';
+        isMenuOpen = !isMenuOpen;
+        
+        if (isMenuOpen) {
+          // Show menu
+          mobileNavMenu.style.display = 'block';
+          mobileNavMenu.classList.remove('-translate-y-full');
+          mobileNavMenu.classList.add('translate-y-0');
+          
+          // Switch icons
+          menuIcon.classList.add('hidden');
+          closeIcon.classList.remove('hidden');
+          
+          // Prevent body scroll
+          document.body.style.overflow = 'hidden';
         } else {
-          spans[0].style.transform = '';
-          spans[1].style.opacity = '1';
-          spans[2].style.transform = '';
+          // Hide menu
+          mobileNavMenu.classList.add('-translate-y-full');
+          mobileNavMenu.classList.remove('translate-y-0');
+          
+          // Switch icons
+          closeIcon.classList.add('hidden');
+          menuIcon.classList.remove('hidden');
+          
+          // Restore body scroll
+          document.body.style.overflow = '';
+          
+          // Hide menu after animation
+          setTimeout(() => {
+            if (!isMenuOpen) {
+              mobileNavMenu.style.display = 'none';
+            }
+          }, 300);
         }
       });
       
       // Close mobile menu when clicking on links
       mobileNavMenu.addEventListener('click', function(e) {
-        if (e.target.tagName === 'A') {
-          mobileNavMenu.classList.remove('open');
-          const spans = mobileMenuToggle.querySelectorAll('span');
-          spans[0].style.transform = '';
-          spans[1].style.opacity = '1';
-          spans[2].style.transform = '';
+        if (e.target.tagName === 'A' || e.target.closest('a')) {
+          isMenuOpen = false;
+          mobileNavMenu.classList.add('-translate-y-full');
+          mobileNavMenu.classList.remove('translate-y-0');
+          closeIcon.classList.add('hidden');
+          menuIcon.classList.remove('hidden');
+          document.body.style.overflow = '';
+          
+          setTimeout(() => {
+            mobileNavMenu.style.display = 'none';
+          }, 300);
+        }
+      });
+      
+      // Close menu when clicking outside
+      document.addEventListener('click', function(e) {
+        if (isMenuOpen && !mobileNavMenu.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+          isMenuOpen = false;
+          mobileNavMenu.classList.add('-translate-y-full');
+          mobileNavMenu.classList.remove('translate-y-0');
+          closeIcon.classList.add('hidden');
+          menuIcon.classList.remove('hidden');
+          document.body.style.overflow = '';
+          
+          setTimeout(() => {
+            mobileNavMenu.style.display = 'none';
+          }, 300);
+        }
+      });
+      
+      // Close menu on window resize to desktop
+      window.addEventListener('resize', function() {
+        if (window.innerWidth >= 768 && isMenuOpen) {
+          isMenuOpen = false;
+          mobileNavMenu.classList.add('-translate-y-full');
+          mobileNavMenu.classList.remove('translate-y-0');
+          closeIcon.classList.add('hidden');
+          menuIcon.classList.remove('hidden');
+          document.body.style.overflow = '';
+          mobileNavMenu.style.display = 'none';
         }
       });
     }
