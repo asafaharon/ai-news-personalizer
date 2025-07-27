@@ -1,264 +1,510 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light" class="smooth-scroll">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Favorites • AI News Personalizer</title>
-  
-  <!-- Tailwind CSS -->
+  <title>My Favorites - AI News Personalizer</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
   
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="/static/style.css" />
-  
-  <!-- Inter Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Theme Detection -->
-  <script>
-    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'light');
-      document.documentElement.classList.remove('dark');
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
     }
-  </script>
+    
+    .hero-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      background-size: 400% 400%;
+      width: 100vw;
+      min-height: 100vh;
+      animation: gradientShift 8s ease-in-out infinite;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .floating-elements {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .floating-circle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      animation: float 8s ease-in-out infinite;
+    }
+    
+    .floating-circle:nth-child(1) {
+      width: 100px;
+      height: 100px;
+      top: 10%;
+      left: 5%;
+      animation-delay: 0s;
+    }
+    
+    .floating-circle:nth-child(2) {
+      width: 80px;
+      height: 80px;
+      top: 70%;
+      right: 10%;
+      animation-delay: 3s;
+    }
+    
+    .floating-circle:nth-child(3) {
+      width: 60px;
+      height: 60px;
+      top: 40%;
+      left: 80%;
+      animation-delay: 6s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(180deg); }
+    }
+    
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      animation: slideInDown 1s ease-out;
+    }
+    
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .main-content {
+      position: relative;
+      z-index: 10;
+      padding: 2rem 0;
+      animation: fadeInUp 1.2s ease-out 0.3s both;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      animation: cardGlow 4s ease-in-out infinite alternate;
+    }
+    
+    @keyframes cardGlow {
+      0% { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); }
+      100% { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 30px rgba(255, 255, 255, 0.1); }
+    }
+    
+    .article-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-radius: 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: slideInCard 0.8s ease-out both;
+    }
+    
+    .article-card:nth-child(even) {
+      animation-delay: 0.2s;
+    }
+    
+    .article-card:nth-child(odd) {
+      animation-delay: 0.4s;
+    }
+    
+    @keyframes slideInCard {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .article-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    .form-input {
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 0.75rem;
+      padding: 0.875rem 1rem;
+      width: 100%;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      transform: scale(1.02);
+    }
+    
+    .btn {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      border-radius: 0.75rem;
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.8);
+      color: #4B5563;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .btn-favorite {
+      background: rgba(251, 191, 36, 0.1);
+      color: #F59E0B;
+      border: 1px solid rgba(251, 191, 36, 0.3);
+    }
+    
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: #DC2626;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 0.5rem;
+    }
+    
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.2);
+    }
+    
+    .nav-link {
+      color: #4B5563;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    
+    .nav-link:hover {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+      transform: translateY(-2px);
+    }
+    
+    .title-glow {
+      animation: titlePulse 3s ease-in-out infinite alternate;
+    }
+    
+    @keyframes titlePulse {
+      0% { text-shadow: 0 0 10px rgba(102, 126, 234, 0.3); }
+      100% { text-shadow: 0 0 20px rgba(102, 126, 234, 0.6); }
+    }
+    
+    .icon-bounce {
+      display: inline-block;
+      animation: iconBounce 2s ease-in-out infinite;
+    }
+    
+    @keyframes iconBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+    
+    .favorite-badge {
+      background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 1rem;
+      animation: badgePulse 3s ease-in-out infinite alternate;
+    }
+    
+    @keyframes badgePulse {
+      0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+      100% { box-shadow: 0 0 0 4px rgba(245, 158, 11, 0); }
+    }
+    
+    .search-container {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6B7280;
+      width: 20px;
+      height: 20px;
+    }
+    
+    .search-input {
+      padding-left: 44px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      animation: fadeIn 1s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .floating-circle {
+        display: none;
+      }
+      
+      .main-content {
+        padding: 1rem 0;
+      }
+      
+      .nav-links {
+        display: none;
+      }
+      
+      .mobile-menu {
+        display: block;
+      }
+    }
+    
+    @media (min-width: 769px) {
+      .mobile-menu {
+        display: none;
+      }
+    }
+  </style>
 </head>
 
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans transition-colors duration-300 safe-area-inset-top safe-area-inset-bottom">
-
+<body class="hero-bg">
+  <!-- Floating background elements -->
+  <div class="floating-elements">
+    <div class="floating-circle"></div>
+    <div class="floating-circle"></div>
+    <div class="floating-circle"></div>
+  </div>
+  
   <!-- Header -->
-  <header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 transition-all duration-300">
-    <div class="container-responsive">
-      <div class="flex items-center justify-between h-16">
-        <div class="flex items-center space-x-4">
-          <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-yellow-500 to-orange-600 flex items-center justify-center">
-            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-            </svg>
-          </div>
-          <div>
-            <h1 class="text-lg font-semibold text-gray-900 dark:text-white">My Favorites</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400 hidden md:block">Your saved articles collection</p>
-          </div>
-        </div>
+  <header class="header">
+    <div class="max-w-6xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <h1 class="text-xl md:text-2xl font-bold text-gray-800 title-glow">
+          <span class="icon-bounce">⭐</span> My Favorites
+        </h1>
         
-        <div class="flex items-center space-x-4">
-          <!-- Theme Toggle -->
-          <button id="themeToggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors touch-target">
-            <svg id="lightIcon" class="w-5 h-5 text-gray-500 dark:text-gray-400 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            <svg id="darkIcon" class="w-5 h-5 text-gray-500 dark:text-gray-400 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            </svg>
-          </button>
-          
-          <!-- Back to Dashboard -->
-          <a href="/dashboard" class="btn btn-secondary px-4 py-2 text-sm interactive touch-target">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Dashboard
-          </a>
+        <!-- Desktop Navigation -->
+        <nav class="nav-links flex gap-2 text-sm">
+          <a href="/dashboard" class="nav-link">Dashboard</a>
+          <a href="/profile" class="nav-link">Preferences</a>
+          <a href="/profile/edit" class="nav-link">Edit Profile</a>
+          <a href="/logout" class="nav-link text-red-600">Logout</a>
+        </nav>
+        
+        <!-- Mobile Menu -->
+        <div class="mobile-menu">
+          <select onchange="if(this.value) window.location.href=this.value" 
+                  class="bg-white/80 border border-white/30 rounded-lg px-3 py-2 text-sm backdrop-blur-sm">
+            <option value="">Menu</option>
+            <option value="/dashboard">Dashboard</option>
+            <option value="/profile">Preferences</option>
+            <option value="/profile/edit">Edit Profile</option>
+            <option value="/logout">Logout</option>
+          </select>
         </div>
       </div>
     </div>
   </header>
 
   <!-- Main Content -->
-  <main class="container-responsive py-8 safe-area-inset-left safe-area-inset-right">
-    
-    <!-- Page Header -->
-    <div class="text-center mb-12">
-      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-r from-yellow-500 to-orange-600 flex items-center justify-center animate-fade-in">
-        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-        </svg>
+  <main class="main-content">
+    <div class="max-w-6xl mx-auto px-4">
+      
+      <!-- Header Card -->
+      <div class="card text-center">
+        <div class="text-6xl mb-4 icon-bounce">💖</div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-3 title-glow">Your Favorite Articles</h1>
+        <p class="text-gray-600 text-lg">
+          All the articles you've saved for later reading, organized in one convenient place.
+        </p>
       </div>
-      <h1 class="text-3xl md:text-4xl font-bold text-gradient mb-3">Your Favorite Articles</h1>
-      <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-        All the articles you've saved for later reading, organized in one convenient place.
-      </p>
-    </div>
 
-    <!-- Search and Filter Bar -->
-    <div class="card p-6 mb-8">
-      <div class="flex flex-col md:flex-row gap-4 items-center">
-        <div class="flex-1 relative">
-          <input 
-            type="text" 
-            placeholder="Search your favorites..." 
-            id="searchFavorites"
-            class="form-input pl-10 pr-4 py-2 w-full text-sm"
-          />
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+      <!-- Search and Filter Bar -->
+      <div class="card">
+        <div class="flex flex-col md:flex-row gap-4 items-center">
+          <div class="flex-1 search-container">
+            <span class="search-icon">🔍</span>
+            <input 
+              type="text" 
+              placeholder="Search your favorites..." 
+              id="searchFavorites"
+              class="form-input search-input"
+            />
+          </div>
+          
+          <div class="flex items-center space-x-4">
+            <select id="sortBy" class="form-input text-sm py-2">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="title">By Title</option>
+              <option value="source">By Source</option>
+            </select>
+            
+            <span class="text-sm text-gray-600">
+              <span id="favoriteCount">{{ favorites|length if favorites else 0 }}</span> articles
+            </span>
           </div>
         </div>
-        
-        <div class="flex items-center space-x-4">
-          <select id="sortBy" class="form-input text-sm py-2">
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="title">By Title</option>
-            <option value="source">By Source</option>
-          </select>
-          
-          <span class="text-sm text-gray-500 dark:text-gray-400">
-            <span id="favoriteCount">{{ favorites|length if favorites else 0 }}</span> articles
-          </span>
-        </div>
       </div>
-    </div>
 
-    <!-- Favorites List -->
-    {% if favorites %}
-      <div id="favoritesList" class="space-y-6">
-        {% for fav in favorites %}
-          <article class="card news-card p-6 group desktop-hover transition-all duration-300 animate-fade-in favorite-item" data-title="{{ fav.title|lower }}" data-source="{{ fav.source|lower }}" data-date="{{ fav.published }}">
-            <div class="flex flex-col md:flex-row md:items-start space-y-4 md:space-y-0 md:space-x-6">
+      <!-- Favorites List -->
+      {% if favorites %}
+        <div id="favoritesList" class="space-y-6">
+          {% for fav in favorites %}
+            <article class="article-card favorite-item" data-title="{{ fav.title|lower }}" data-source="{{ fav.source|lower }}" data-date="{{ fav.published }}">
               
-              <!-- Article Image Placeholder -->
-              <div class="w-full md:w-32 h-48 md:h-32 bg-gradient-to-br from-yellow-100 to-orange-200 dark:from-yellow-900/30 dark:to-orange-800/30 rounded-lg flex-shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                <svg class="w-8 h-8 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                </svg>
+              <!-- Favorite Badge -->
+              <div class="p-6 pb-0">
+                <div class="favorite-badge">
+                  <span class="icon-bounce">⭐</span> Favorite Article
+                </div>
               </div>
-
+              
               <!-- Article Content -->
-              <div class="flex-1 min-w-0">
+              <div class="px-6 pb-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-3">{{ fav.title }}</h2>
                 
-                <!-- Favorite Badge -->
-                <div class="flex items-center mb-2">
-                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200">
-                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                    </svg>
-                    Favorite
+                <div class="flex items-center text-sm text-gray-500 mb-4 gap-4">
+                  <span class="flex items-center gap-1">
+                    <span class="icon-bounce">📅</span> {{ fav.published[:10] }}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <span class="icon-bounce">📰</span> {{ fav.source }}
                   </span>
                 </div>
                 
-                <!-- Article Header -->
-                <div class="mb-3">
-                  <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-yellow-600 dark:group-hover:text-yellow-400 transition-colors line-clamp-2">
-                    {{ fav.title }}
-                  </h2>
-                  <div class="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                    <span class="inline-flex items-center">
-                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      {{ fav.published[:10] }}
-                    </span>
-                    <span class="inline-flex items-center">
-                      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                      </svg>
-                      {{ fav.source }}
-                    </span>
-                  </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex flex-col space-y-3 md:flex-row md:space-y-0 md:items-center md:justify-between">
-                  <div class="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-4">
-                    <a href="{{ fav.url }}" target="_blank" class="btn btn-primary text-sm interactive touch-target">
-                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                      <span class="hidden-mobile">Read Full Article</span>
-                      <span class="hidden-desktop">Read More</span>
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                  <div class="flex gap-2">
+                    <a href="{{ fav.url }}" 
+                       target="_blank" 
+                       class="btn btn-primary">
+                      <span>📖</span> Read Article
                     </a>
                     
-                    <!-- Share Button -->
-                    <button onclick="shareArticle('{{ fav.title }}', '{{ fav.url }}')" class="btn btn-secondary text-sm interactive touch-target">
-                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-                      </svg>
-                      Share
+                    <button onclick="shareArticle('{{ fav.title }}', '{{ fav.url }}')" 
+                            class="btn btn-secondary">
+                      <span>📤</span> Share
                     </button>
                   </div>
 
                   <!-- Remove from Favorites -->
                   <form method="post" action="/favorites/remove" class="inline-block" onsubmit="return confirmRemove('{{ fav.title }}')">
                     <input type="hidden" name="url" value="{{ fav.url }}">
-                    <button type="submit" class="touch-target p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors group" title="Remove from Favorites">
-                      <svg class="w-5 h-5 text-gray-400 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
+                    <button type="submit" class="btn btn-danger" title="Remove from Favorites">
+                      <span>🗑️</span>
                     </button>
                   </form>
                 </div>
               </div>
-            </div>
-          </article>
-        {% endfor %}
-      </div>
-    {% else %}
-      <!-- Empty State -->
-      <div class="text-center py-16">
-        <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 flex items-center justify-center">
-          <svg class="w-12 h-12 text-yellow-500 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
+            </article>
+          {% endfor %}
         </div>
-        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Favorites Yet</h3>
-        <p class="text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto">
-          Start building your personal collection by saving articles you love from your dashboard.
-        </p>
-        <a href="/dashboard" class="btn btn-primary">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-          </svg>
-          Browse News Articles
-        </a>
-      </div>
-    {% endif %}
+      {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+          <div class="card">
+            <div class="text-6xl mb-4">💔</div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">No Favorites Yet</h3>
+            <p class="text-gray-600 mb-6 max-w-md mx-auto">
+              Start building your personal collection by saving articles you love from your dashboard.
+            </p>
+            <a href="/dashboard" class="btn btn-primary">
+              <span>📰</span> Browse News Articles
+            </a>
+          </div>
+        </div>
+      {% endif %}
+      
+    </div>
   </main>
 
-  <!-- Toast Container -->
-  <div id="toast-container" class="fixed top-20 right-4 z-40 space-y-2 safe-area-inset-right"></div>
-
-  <!-- Scroll to Top Button -->
-  <button id="scrollToTop" class="scroll-to-top" aria-label="Scroll to top">
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-    </svg>
-  </button>
-
-  <!-- JavaScript -->
   <script>
-    // Theme Toggle Functionality
-    const themeToggle = document.getElementById('themeToggle');
-    const lightIcon = document.getElementById('lightIcon');
-    const darkIcon = document.getElementById('darkIcon');
-
-    themeToggle.addEventListener('click', function() {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      
-      document.documentElement.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      
-      if (newTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-        lightIcon.classList.remove('hidden');
-        darkIcon.classList.add('hidden');
-      } else {
-        document.documentElement.classList.remove('dark');
-        lightIcon.classList.add('hidden');
-        darkIcon.classList.remove('hidden');
-      }
-      
-      showToast('Theme updated to ' + newTheme + ' mode', 'info');
-    });
-
     // Search Functionality
     const searchInput = document.getElementById('searchFavorites');
     if (searchInput) {
@@ -313,7 +559,6 @@
         
         // Re-append sorted items
         items.forEach(item => container.appendChild(item));
-        showToast('Favorites sorted by ' + sortBy.replace('_', ' '), 'info');
       });
     }
 
@@ -324,7 +569,7 @@
           title: title,
           url: url
         }).then(() => {
-          showToast('Article shared successfully!', 'success');
+          alert('Article shared successfully!');
         }).catch((error) => {
           console.log('Error sharing:', error);
           fallbackShare(title, url);
@@ -336,127 +581,18 @@
 
     function fallbackShare(title, url) {
       navigator.clipboard.writeText(url).then(() => {
-        showToast('Article link copied to clipboard!', 'success');
+        alert('Article link copied to clipboard!');
       }).catch(() => {
-        showToast('Unable to share article', 'error');
+        alert('Unable to share article');
       });
     }
 
     // Confirm Remove Function
     function confirmRemove(title) {
       const confirmed = confirm(`Are you sure you want to remove "${title.substring(0, 50)}..." from your favorites?`);
-      if (confirmed) {
-        showToast('Article removed from favorites', 'success');
-      }
       return confirmed;
     }
-
-    // Toast Notification System
-    function showToast(message, type = 'info') {
-      const toastContainer = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      toast.className = `toast toast-${type} animate-fade-in`;
-      toast.innerHTML = `
-        <div class="flex items-center justify-between">
-          <span>${message}</span>
-          <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      `;
-      
-      toastContainer.appendChild(toast);
-      
-      // Auto remove after 5 seconds
-      setTimeout(() => {
-        if (toast.parentNode) {
-          toast.remove();
-        }
-      }, 5000);
-    }
-
-    // Scroll to Top Functionality
-    const scrollToTopBtn = document.getElementById('scrollToTop');
-    
-    window.addEventListener('scroll', function() {
-      if (window.pageYOffset > 300) {
-        scrollToTopBtn.classList.add('visible');
-      } else {
-        scrollToTopBtn.classList.remove('visible');
-      }
-    });
-    
-    scrollToTopBtn.addEventListener('click', function() {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    });
-
-    // Enhanced touch support for mobile
-    if ('ontouchstart' in window) {
-      document.body.classList.add('touch-device');
-    }
-
-    // Add CSS classes for line clamping
-    const style = document.createElement('style');
-    style.textContent = `
-      .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-    `;
-    document.head.appendChild(style);
-
-    // Enhanced Scroll Functionality
-    const scrollToTopBtn = document.getElementById('scrollToTop');
-    const scrollProgress = document.getElementById('scrollProgress');
-    
-    // Scroll progress and scroll-to-top functionality
-    window.addEventListener('scroll', function() {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const scrollPercentage = (scrollTop / scrollHeight) * 100;
-      
-      // Update progress bar
-      if (scrollProgress) {
-        scrollProgress.style.width = scrollPercentage + '%';
-      }
-      
-      // Show/hide scroll to top button
-      if (scrollTop > 300) {
-        scrollToTopBtn.classList.add('visible');
-      } else {
-        scrollToTopBtn.classList.remove('visible');
-      }
-    });
-    
-    if (scrollToTopBtn) {
-      scrollToTopBtn.addEventListener('click', function() {
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
-      });
-    }
   </script>
-
-  <!-- Scroll Progress Bar -->
-  <div id="scrollProgress" class="scroll-progress"></div>
-
-  <!-- Floating Scroll Actions -->
-  <div class="floating-scroll-actions">
-    <!-- Scroll to Top Button -->
-    <button id="scrollToTop" class="scroll-to-top" aria-label="Scroll to top" title="Back to top">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-      </svg>
-    </button>
-  </div>
 
 </body>
 </html>

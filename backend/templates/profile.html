@@ -1,380 +1,711 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light" class="smooth-scroll">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Personal News Preferences • AI News Personalizer</title>
-  
-  <!-- Tailwind CSS -->
+  <title>Profile - AI News Personalizer</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
   
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="/static/style.css" />
-  
-  <!-- Inter Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Theme Detection -->
-  <script>
-    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'light');
-      document.documentElement.classList.remove('dark');
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
     }
-  </script>
+    
+    .hero-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      background-size: 400% 400%;
+      width: 100vw;
+      min-height: 100vh;
+      animation: gradientShift 8s ease-in-out infinite;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .floating-elements {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .floating-circle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      animation: float 8s ease-in-out infinite;
+    }
+    
+    .floating-circle:nth-child(1) {
+      width: 100px;
+      height: 100px;
+      top: 10%;
+      left: 5%;
+      animation-delay: 0s;
+    }
+    
+    .floating-circle:nth-child(2) {
+      width: 80px;
+      height: 80px;
+      top: 70%;
+      right: 10%;
+      animation-delay: 3s;
+    }
+    
+    .floating-circle:nth-child(3) {
+      width: 60px;
+      height: 60px;
+      top: 40%;
+      left: 80%;
+      animation-delay: 6s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(180deg); }
+    }
+    
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      animation: slideInDown 1s ease-out;
+    }
+    
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .main-content {
+      position: relative;
+      z-index: 10;
+      padding: 2rem 0;
+      animation: fadeInUp 1.2s ease-out 0.3s both;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      animation: cardGlow 4s ease-in-out infinite alternate;
+    }
+    
+    @keyframes cardGlow {
+      0% { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); }
+      100% { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 30px rgba(255, 255, 255, 0.1); }
+    }
+    
+    .category-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: slideInCard 0.8s ease-out both;
+    }
+    
+    .category-card:nth-child(even) {
+      animation-delay: 0.2s;
+    }
+    
+    .category-card:nth-child(odd) {
+      animation-delay: 0.4s;
+    }
+    
+    @keyframes slideInCard {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .category-card:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .topic-tag {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-block;
+      margin: 0.25rem 0.25rem 0.25rem 0;
+      animation: tagPulse 3s ease-in-out infinite alternate;
+    }
+    
+    @keyframes tagPulse {
+      0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+      100% { box-shadow: 0 0 0 4px rgba(102, 126, 234, 0); }
+    }
+    
+    .checkbox-custom {
+      position: relative;
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 4px;
+      margin-right: 0.75rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .checkbox-custom:hover {
+      border-color: #667eea;
+      background: rgba(102, 126, 234, 0.1);
+    }
+    
+    .checkbox-custom.checked {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-color: #667eea;
+    }
+    
+    .checkbox-custom.checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .btn {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+      color: white;
+      border: none;
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.8);
+      color: #4B5563;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .nav-link {
+      color: #4B5563;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    
+    .nav-link:hover {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+      transform: translateY(-2px);
+    }
+    
+    .title-glow {
+      animation: titlePulse 3s ease-in-out infinite alternate;
+    }
+    
+    @keyframes titlePulse {
+      0% { text-shadow: 0 0 10px rgba(102, 126, 234, 0.3); }
+      100% { text-shadow: 0 0 20px rgba(102, 126, 234, 0.6); }
+    }
+    
+    .icon-bounce {
+      display: inline-block;
+      animation: iconBounce 2s ease-in-out infinite;
+    }
+    
+    @keyframes iconBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+      animation: progressPulse 2s ease-in-out infinite alternate;
+    }
+    
+    @keyframes progressPulse {
+      0% { box-shadow: 0 0 5px rgba(102, 126, 234, 0.3); }
+      100% { box-shadow: 0 0 15px rgba(102, 126, 234, 0.6); }
+    }
+    
+    .slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.3);
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .floating-circle {
+        display: none;
+      }
+      
+      .main-content {
+        padding: 1rem 0;
+      }
+      
+      .nav-links {
+        display: none;
+      }
+      
+      .mobile-menu {
+        display: block;
+      }
+    }
+    
+    @media (min-width: 769px) {
+      .mobile-menu {
+        display: none;
+      }
+    }
+  </style>
 </head>
 
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans transition-colors duration-300 safe-area-inset-top safe-area-inset-bottom">
-
+<body class="hero-bg">
+  <!-- Floating background elements -->
+  <div class="floating-elements">
+    <div class="floating-circle"></div>
+    <div class="floating-circle"></div>
+    <div class="floating-circle"></div>
+  </div>
+  
   <!-- Header -->
-  <header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 transition-all duration-300">
-    <div class="container-responsive">
-      <div class="flex items-center justify-between h-16">
-        <div class="flex items-center space-x-4">
-          <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </div>
-          <div>
-            <h1 class="text-lg font-semibold text-gray-900 dark:text-white">News Preferences</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400 hidden md:block">Customize your personalized news feed</p>
-          </div>
-        </div>
+  <header class="header">
+    <div class="max-w-6xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <h1 class="text-xl md:text-2xl font-bold text-gray-800 title-glow">
+          <span class="icon-bounce">⚙️</span> News Preferences
+        </h1>
         
-        <!-- Theme Toggle -->
-        <button id="themeToggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors touch-target">
-          <svg id="lightIcon" class="w-5 h-5 text-gray-500 dark:text-gray-400 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-          </svg>
-          <svg id="darkIcon" class="w-5 h-5 text-gray-500 dark:text-gray-400 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-          </svg>
-        </button>
+        <!-- Desktop Navigation -->
+        <nav class="nav-links flex gap-2 text-sm">
+          <a href="/dashboard" class="nav-link">Dashboard</a>
+          <a href="/profile/edit" class="nav-link">Edit Profile</a>
+          <a href="/favorites" class="nav-link">Favorites</a>
+          <a href="/logout" class="nav-link text-red-600">Logout</a>
+        </nav>
+        
+        <!-- Mobile Menu -->
+        <div class="mobile-menu">
+          <select onchange="if(this.value) window.location.href=this.value" 
+                  class="bg-white/80 border border-white/30 rounded-lg px-3 py-2 text-sm backdrop-blur-sm">
+            <option value="">Menu</option>
+            <option value="/dashboard">Dashboard</option>
+            <option value="/profile/edit">Edit Profile</option>
+            <option value="/favorites">Favorites</option>
+            <option value="/logout">Logout</option>
+          </select>
+        </div>
       </div>
     </div>
   </header>
 
   <!-- Main Content -->
-  <main class="container-responsive py-8 safe-area-inset-left safe-area-inset-right">
-    
-    <!-- Header Section -->
-    <div class="text-center mb-12">
-      <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center animate-fade-in">
-        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-        </svg>
-      </div>
-      <h1 class="text-3xl md:text-4xl font-bold text-gradient mb-3">Choose Your Interests</h1>
-      <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-        Select the topics that matter most to you. We'll curate personalized news articles based on your preferences.
-      </p>
-    </div>
-
-    <!-- Preferences Form -->
-    <form id="prefsForm" action="/profile" method="post" class="space-y-8">
+  <main class="main-content">
+    <div class="max-w-4xl mx-auto px-4">
       
-      <!-- Progress Indicator -->
-      <div class="card p-6 mb-8">
+      <!-- Header Card -->
+      <div class="card text-center">
+        <div class="text-6xl mb-4 icon-bounce">🎯</div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-3 title-glow">Choose Your Interests</h1>
+        <p class="text-gray-600 text-lg">
+          Select the topics that matter most to you. We'll curate personalized news articles based on your preferences.
+        </p>
+      </div>
+
+      <!-- Progress Card -->
+      <div class="card">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Selection Progress</h2>
-          <span id="selectionCount" class="text-sm font-medium px-3 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
+          <h2 class="text-lg font-semibold text-gray-800">Selection Progress</h2>
+          <span id="selectionCount" class="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-medium">
             0 topics selected
           </span>
         </div>
-        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-          <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+        <div class="progress-bar">
+          <div id="progressBar" class="progress-fill" style="width: 0%"></div>
         </div>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Select at least one topic to continue</p>
+        <p class="text-sm text-gray-600 mt-2">Select at least one topic to continue</p>
       </div>
 
-      <!-- Topics Section -->
-      <div class="card p-6 md:p-8">
-        <div class="flex items-center mb-6">
-          <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-green-400 to-blue-500 flex items-center justify-center mr-4">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-            </svg>
-          </div>
-          <div>
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white">News Categories</h2>
-            <p class="text-gray-500 dark:text-gray-400">Choose from our curated selection of topics</p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
+      <!-- Preferences Form -->
+      <form id="prefsForm" action="/profile" method="post">
+        
+        <!-- Topics Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          
           <!-- Technology -->
-          <div class="topic-category border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300 scroll-fade-in">
+          <div class="category-card">
             <div class="flex items-center mb-4">
-              <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-400 to-cyan-500 flex items-center justify-center mr-3">
-                <span class="text-sm">🧠</span>
+              <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-400 to-cyan-500 flex items-center justify-center mr-3">
+                <span class="text-lg">🧠</span>
               </div>
-              <h3 class="font-bold text-lg text-gray-900 dark:text-white">Technology</h3>
+              <h3 class="font-bold text-lg text-gray-800">Technology</h3>
             </div>
             <div class="space-y-3">
               {% for t in ["AI","Cyber","Mobile","Gadgets","Startups"] %}
-              <label class="flex items-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer touch-target">
+              <label class="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <div class="checkbox-custom {% if t in preferences.get('topics', []) %}checked{% endif %}" 
+                     onclick="toggleCheckbox(this, '{{ t }}')" data-topic="{{ t }}"></div>
                 <input type="checkbox" name="topics" value="{{ t }}" 
                        {% if t in preferences.get("topics", []) %}checked{% endif %}
-                       class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-3">
-                <span class="text-gray-700 dark:text-gray-300">{{ t }}</span>
+                       class="hidden" onchange="updateProgress()" id="topic-{{ t }}">
+                <span class="text-gray-700 ml-2">{{ t }}</span>
               </label>
               {% endfor %}
             </div>
           </div>
 
           <!-- Business -->
-          <div class="topic-category border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:border-green-300 dark:hover:border-green-600 transition-all duration-300">
+          <div class="category-card">
             <div class="flex items-center mb-4">
-              <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-green-400 to-emerald-500 flex items-center justify-center mr-3">
-                <span class="text-sm">💼</span>
+              <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-green-400 to-emerald-500 flex items-center justify-center mr-3">
+                <span class="text-lg">💼</span>
               </div>
-              <h3 class="font-bold text-lg text-gray-900 dark:text-white">Business</h3>
+              <h3 class="font-bold text-lg text-gray-800">Business</h3>
             </div>
             <div class="space-y-3">
               {% for t in ["Crypto","Fintech","StockMarket","RealEstate","Leadership"] %}
-              <label class="flex items-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer touch-target">
+              <label class="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <div class="checkbox-custom {% if t in preferences.get('topics', []) %}checked{% endif %}" 
+                     onclick="toggleCheckbox(this, '{{ t }}')" data-topic="{{ t }}"></div>
                 <input type="checkbox" name="topics" value="{{ t }}" 
                        {% if t in preferences.get("topics", []) %}checked{% endif %}
-                       class="form-checkbox h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500 mr-3">
-                <span class="text-gray-700 dark:text-gray-300">{{ t }}</span>
+                       class="hidden" onchange="updateProgress()" id="topic-{{ t }}">
+                <span class="text-gray-700 ml-2">{{ t }}</span>
               </label>
               {% endfor %}
             </div>
           </div>
 
           <!-- Sports -->
-          <div class="topic-category border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:border-orange-300 dark:hover:border-orange-600 transition-all duration-300">
+          <div class="category-card">
             <div class="flex items-center mb-4">
-              <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-orange-400 to-red-500 flex items-center justify-center mr-3">
-                <span class="text-sm">🏅</span>
+              <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-orange-400 to-red-500 flex items-center justify-center mr-3">
+                <span class="text-lg">🏅</span>
               </div>
-              <h3 class="font-bold text-lg text-gray-900 dark:text-white">Sports</h3>
+              <h3 class="font-bold text-lg text-gray-800">Sports</h3>
             </div>
             <div class="space-y-3">
               {% for t in ["Football","Basketball","Tennis","Olympics","Running"] %}
-              <label class="flex items-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer touch-target">
+              <label class="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <div class="checkbox-custom {% if t in preferences.get('topics', []) %}checked{% endif %}" 
+                     onclick="toggleCheckbox(this, '{{ t }}')" data-topic="{{ t }}"></div>
                 <input type="checkbox" name="topics" value="{{ t }}" 
                        {% if t in preferences.get("topics", []) %}checked{% endif %}
-                       class="form-checkbox h-4 w-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500 mr-3">
-                <span class="text-gray-700 dark:text-gray-300">{{ t }}</span>
+                       class="hidden" onchange="updateProgress()" id="topic-{{ t }}">
+                <span class="text-gray-700 ml-2">{{ t }}</span>
               </label>
               {% endfor %}
             </div>
           </div>
 
           <!-- Health -->
-          <div class="topic-category border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:border-pink-300 dark:hover:border-pink-600 transition-all duration-300">
+          <div class="category-card">
             <div class="flex items-center mb-4">
-              <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-pink-400 to-rose-500 flex items-center justify-center mr-3">
-                <span class="text-sm">🧬</span>
+              <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-pink-400 to-rose-500 flex items-center justify-center mr-3">
+                <span class="text-lg">🧬</span>
               </div>
-              <h3 class="font-bold text-lg text-gray-900 dark:text-white">Health</h3>
+              <h3 class="font-bold text-lg text-gray-800">Health</h3>
             </div>
             <div class="space-y-3">
               {% for t in ["Nutrition","MentalHealth","Fitness","Medicine","Wellness"] %}
-              <label class="flex items-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer touch-target">
+              <label class="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <div class="checkbox-custom {% if t in preferences.get('topics', []) %}checked{% endif %}" 
+                     onclick="toggleCheckbox(this, '{{ t }}')" data-topic="{{ t }}"></div>
                 <input type="checkbox" name="topics" value="{{ t }}" 
                        {% if t in preferences.get("topics", []) %}checked{% endif %}
-                       class="form-checkbox h-4 w-4 text-pink-600 border-gray-300 rounded focus:ring-pink-500 mr-3">
-                <span class="text-gray-700 dark:text-gray-300">{{ t }}</span>
+                       class="hidden" onchange="updateProgress()" id="topic-{{ t }}">
+                <span class="text-gray-700 ml-2">{{ t }}</span>
               </label>
               {% endfor %}
             </div>
           </div>
 
           <!-- Science -->
-          <div class="topic-category border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:border-purple-300 dark:hover:border-purple-600 transition-all duration-300">
+          <div class="category-card">
             <div class="flex items-center mb-4">
-              <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center justify-center mr-3">
-                <span class="text-sm">🔬</span>
+              <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center justify-center mr-3">
+                <span class="text-lg">🔬</span>
               </div>
-              <h3 class="font-bold text-lg text-gray-900 dark:text-white">Science</h3>
+              <h3 class="font-bold text-lg text-gray-800">Science</h3>
             </div>
             <div class="space-y-3">
               {% for t in ["Space","Climate","Physics","Biology","Chemistry"] %}
-              <label class="flex items-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer touch-target">
+              <label class="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <div class="checkbox-custom {% if t in preferences.get('topics', []) %}checked{% endif %}" 
+                     onclick="toggleCheckbox(this, '{{ t }}')"></div>
                 <input type="checkbox" name="topics" value="{{ t }}" 
                        {% if preferences.get("topics") and t in preferences.get("topics") %}checked{% endif %}
-                       class="form-checkbox h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 mr-3">
-                <span class="text-gray-700 dark:text-gray-300">{{ t }}</span>
+                       class="hidden" onchange="updateProgress()">
+                <span class="text-gray-700">{{ t }}</span>
               </label>
               {% endfor %}
             </div>
           </div>
 
           <!-- Entertainment -->
-          <div class="topic-category border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:border-yellow-300 dark:hover:border-yellow-600 transition-all duration-300">
+          <div class="category-card">
             <div class="flex items-center mb-4">
-              <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center mr-3">
-                <span class="text-sm">🎬</span>
+              <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center mr-3">
+                <span class="text-lg">🎬</span>
               </div>
-              <h3 class="font-bold text-lg text-gray-900 dark:text-white">Entertainment</h3>
+              <h3 class="font-bold text-lg text-gray-800">Entertainment</h3>
             </div>
             <div class="space-y-3">
               {% for t in ["Movies","Music","TV","Celebs","Gaming"] %}
-              <label class="flex items-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer touch-target">
+              <label class="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <div class="checkbox-custom {% if t in preferences.get('topics', []) %}checked{% endif %}" 
+                     onclick="toggleCheckbox(this, '{{ t }}')"></div>
                 <input type="checkbox" name="topics" value="{{ t }}" 
                        {% if t in preferences.get('topics', []) %}checked{% endif %}
-                       class="form-checkbox h-4 w-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500 mr-3">
-                <span class="text-gray-700 dark:text-gray-300">{{ t }}</span>
+                       class="hidden" onchange="updateProgress()">
+                <span class="text-gray-700">{{ t }}</span>
               </label>
               {% endfor %}
             </div>
           </div>
 
           <!-- Politics -->
-          <div class="topic-category border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:border-red-300 dark:hover:border-red-600 transition-all duration-300">
+          <div class="category-card">
             <div class="flex items-center mb-4">
-              <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-red-400 to-pink-500 flex items-center justify-center mr-3">
-                <span class="text-sm">🏛️</span>
+              <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-red-400 to-pink-500 flex items-center justify-center mr-3">
+                <span class="text-lg">🏛️</span>
               </div>
-              <h3 class="font-bold text-lg text-gray-900 dark:text-white">Politics</h3>
+              <h3 class="font-bold text-lg text-gray-800">Politics</h3>
             </div>
             <div class="space-y-3">
               {% for t in ["Elections","Policy","Diplomacy","Security","EconomyPolitics"] %}
-              <label class="flex items-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer touch-target">
+              <label class="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <div class="checkbox-custom {% if t in preferences.get('topics', []) %}checked{% endif %}" 
+                     onclick="toggleCheckbox(this, '{{ t }}')"></div>
                 <input type="checkbox" name="topics" value="{{ t }}" 
                        {% if t in preferences.get('topics', []) %}checked{% endif %}
-                       class="form-checkbox h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500 mr-3">
-                <span class="text-gray-700 dark:text-gray-300">{{ t }}</span>
+                       class="hidden" onchange="updateProgress()">
+                <span class="text-gray-700">{{ t }}</span>
               </label>
               {% endfor %}
             </div>
           </div>
 
           <!-- Lifestyle -->
-          <div class="topic-category border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:border-teal-300 dark:hover:border-teal-600 transition-all duration-300">
+          <div class="category-card">
             <div class="flex items-center mb-4">
-              <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-teal-400 to-cyan-500 flex items-center justify-center mr-3">
-                <span class="text-sm">🌿</span>
+              <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-teal-400 to-cyan-500 flex items-center justify-center mr-3">
+                <span class="text-lg">🌿</span>
               </div>
-              <h3 class="font-bold text-lg text-gray-900 dark:text-white">Lifestyle</h3>
+              <h3 class="font-bold text-lg text-gray-800">Lifestyle</h3>
             </div>
             <div class="space-y-3">
               {% for t in ["Travel","Food","Fashion","Home","Culture"] %}
-              <label class="flex items-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer touch-target">
+              <label class="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <div class="checkbox-custom {% if t in preferences.get('topics', []) %}checked{% endif %}" 
+                     onclick="toggleCheckbox(this, '{{ t }}')"></div>
                 <input type="checkbox" name="topics" value="{{ t }}" 
                        {% if t in preferences.get('topics', []) %}checked{% endif %}
-                       class="form-checkbox h-4 w-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500 mr-3">
-                <span class="text-gray-700 dark:text-gray-300">{{ t }}</span>
+                       class="hidden" onchange="updateProgress()">
+                <span class="text-gray-700">{{ t }}</span>
               </label>
               {% endfor %}
             </div>
           </div>
 
         </div>
-      </div>
 
-      <!-- Article Count Settings -->
-      <div class="card p-6 md:p-8">
-        <div class="flex items-center mb-6">
-          <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-indigo-400 to-purple-500 flex items-center justify-center mr-4">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
+        <!-- Article Count Settings -->
+        <div class="card">
+          <div class="flex items-center mb-6">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-indigo-400 to-purple-500 flex items-center justify-center mr-4">
+              <span class="text-lg icon-bounce">📰</span>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-gray-800">Article Settings</h2>
+              <p class="text-gray-600">Configure how many articles you'd like to see</p>
+            </div>
           </div>
-          <div>
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white">Article Settings</h2>
-            <p class="text-gray-500 dark:text-gray-400">Configure how many articles you'd like to see</p>
-          </div>
-        </div>
-        
-        <div class="max-w-md">
-          <label for="article_count" class="block mb-3 font-semibold text-gray-700 dark:text-gray-300">
-            Number of Articles per Session
-          </label>
-          <div class="relative">
+          
+          <div class="max-w-md">
+            <label for="article_count" class="block mb-3 font-semibold text-gray-700">
+              Number of Articles per Session
+            </label>
             <input type="range" id="article_count" name="article_count"
                    value="{{ article_count or 10 }}" min="1" max="20"
-                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 slider"
+                   class="slider"
                    oninput="updateArticleCount(this.value)" />
-            <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mt-2">
+            <div class="flex justify-between text-sm text-gray-500 mt-2">
               <span>1</span>
               <span>20</span>
             </div>
-          </div>
-          <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <div class="flex items-center justify-between">
-              <span class="text-gray-700 dark:text-gray-300">Selected:</span>
-              <span id="articleCountDisplay" class="font-bold text-lg text-blue-600 dark:text-blue-400">{{ article_count or 10 }}</span>
+            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+              <div class="flex items-center justify-between">
+                <span class="text-gray-700">Selected:</span>
+                <span id="articleCountDisplay" class="font-bold text-lg text-blue-600">{{ article_count or 10 }}</span>
+              </div>
+              <p class="text-sm text-gray-500 mt-1">articles per session</p>
             </div>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">articles per session</p>
           </div>
         </div>
-      </div>
 
-      <!-- Action Buttons -->
-      <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
-        <button type="submit" id="saveButton"
-                class="btn btn-primary w-full md:w-auto px-8 py-4 text-lg font-semibold focus-ring touch-target disabled:opacity-50 disabled:cursor-not-allowed">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
-          <span id="saveButtonText">Save Preferences</span>
-          <div id="saveButtonSpinner" class="spinner hidden ml-2"></div>
-        </button>
-        
-        <a href="/dashboard" class="btn btn-secondary w-full md:w-auto px-8 py-4 text-lg font-semibold interactive touch-target">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back to Dashboard
-        </a>
-      </div>
-    </form>
+        <!-- Action Buttons -->
+        <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+          <button type="submit" id="saveButton"
+                  class="btn btn-primary w-full md:w-auto px-8 py-4 text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+            <span class="icon-bounce">✅</span>
+            <span id="saveButtonText">Save Preferences</span>
+          </button>
+          
+          <a href="/dashboard" class="btn btn-secondary w-full md:w-auto px-8 py-4 text-lg font-semibold">
+            <span class="icon-bounce">🏠</span>
+            Back to Dashboard
+          </a>
+        </div>
+      </form>
+      
+    </div>
   </main>
 
-  <!-- Toast Container -->
-  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2 safe-area-inset-right"></div>
-
-  <!-- Scroll Progress Bar -->
-  <div id="scrollProgress" class="scroll-progress"></div>
-
-  <!-- Floating Scroll Actions -->
-  <div class="floating-scroll-actions">
-    <!-- Scroll to Top Button -->
-    <button id="scrollToTop" class="scroll-to-top" aria-label="Scroll to top" title="Back to top">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-      </svg>
-    </button>
-  </div>
-
-  <!-- JavaScript -->
   <script>
-    // Theme Toggle Functionality
-    const themeToggle = document.getElementById('themeToggle');
-    const lightIcon = document.getElementById('lightIcon');
-    const darkIcon = document.getElementById('darkIcon');
-
-    themeToggle.addEventListener('click', function() {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    function toggleCheckbox(element, value) {
+      console.log('Toggling checkbox for:', value);
+      const checkbox = element.nextElementSibling;
       
-      document.documentElement.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      
-      if (newTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-        lightIcon.classList.remove('hidden');
-        darkIcon.classList.add('hidden');
+      if (checkbox && checkbox.type === 'checkbox') {
+        checkbox.checked = !checkbox.checked;
+        element.classList.toggle('checked', checkbox.checked);
+        console.log(`${value} is now:`, checkbox.checked ? 'checked' : 'unchecked');
+        updateProgress();
       } else {
-        document.documentElement.classList.remove('dark');
-        lightIcon.classList.add('hidden');
-        darkIcon.classList.remove('hidden');
+        console.error('Checkbox not found for:', value);
       }
+    }
+
+    // Alternative: Allow clicking on the entire label to work
+    document.addEventListener('DOMContentLoaded', function() {
+      // Make sure labels work properly
+      const labels = document.querySelectorAll('label');
+      labels.forEach(label => {
+        label.addEventListener('click', function(e) {
+          // If clicked on the custom checkbox div, don't let the label handle it
+          if (e.target.classList.contains('checkbox-custom')) {
+            e.preventDefault();
+          }
+        });
+      });
       
-      showToast('Theme updated to ' + newTheme + ' mode', 'info');
+      // Initial progress update
+      updateProgress();
     });
 
-    // Progress Tracking
     function updateProgress() {
       const checkboxes = document.querySelectorAll('input[name="topics"]');
       const checkedCount = [...checkboxes].filter(cb => cb.checked).length;
@@ -384,7 +715,6 @@
       document.getElementById('progressBar').style.width = percentage + '%';
       document.getElementById('selectionCount').textContent = `${checkedCount} topic${checkedCount !== 1 ? 's' : ''} selected`;
       
-      // Enable/disable save button
       const saveButton = document.getElementById('saveButton');
       if (checkedCount > 0) {
         saveButton.disabled = false;
@@ -395,131 +725,33 @@
       }
     }
 
-    // Article Count Slider
     function updateArticleCount(value) {
       document.getElementById('articleCountDisplay').textContent = value;
     }
 
-    // Form Validation and Submission
     document.getElementById('prefsForm').addEventListener('submit', function(e) {
       const anyChecked = [...document.querySelectorAll('input[name="topics"]')]
                           .some(cb => cb.checked);
       
       if (!anyChecked) {
         e.preventDefault();
-        showToast('Please select at least one topic before continuing.', 'error');
+        alert('Please select at least one topic before continuing.');
         return;
       }
       
-      // Show loading state
       const saveButton = document.getElementById('saveButton');
       const saveButtonText = document.getElementById('saveButtonText');
-      const saveButtonSpinner = document.getElementById('saveButtonSpinner');
       
       saveButton.disabled = true;
       saveButtonText.textContent = 'Saving...';
-      saveButtonSpinner.classList.remove('hidden');
-    });
-
-    // Toast Notification System
-    function showToast(message, type = 'info') {
-      const toastContainer = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      toast.className = `toast toast-${type} animate-fade-in`;
-      toast.innerHTML = `
-        <div class="flex items-center justify-between">
-          <span>${message}</span>
-          <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      `;
-      
-      toastContainer.appendChild(toast);
-      
-      // Auto remove after 5 seconds
-      setTimeout(() => {
-        if (toast.parentNode) {
-          toast.remove();
-        }
-      }, 5000);
-    }
-
-    // Enhanced Scroll Functionality
-    const scrollToTopBtn = document.getElementById('scrollToTop');
-    const scrollProgress = document.getElementById('scrollProgress');
-    
-    // Scroll progress and scroll-to-top functionality
-    window.addEventListener('scroll', function() {
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const scrollPercentage = (scrollTop / scrollHeight) * 100;
-      
-      // Update progress bar
-      if (scrollProgress) {
-        scrollProgress.style.width = scrollPercentage + '%';
-      }
-      
-      // Show/hide scroll to top button
-      if (scrollTop > 300) {
-        scrollToTopBtn.classList.add('visible');
-      } else {
-        scrollToTopBtn.classList.remove('visible');
-      }
-      
-      // Animate elements on scroll (fade in effect)
-      const fadeInElements = document.querySelectorAll('.scroll-fade-in');
-      fadeInElements.forEach(element => {
-        const elementTop = element.getBoundingClientRect().top;
-        const elementVisible = 150;
-        
-        if (elementTop < window.innerHeight - elementVisible) {
-          element.classList.add('visible');
-        }
-      });
-    });
-    
-    scrollToTopBtn.addEventListener('click', function() {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
     });
 
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
-      // Add event listeners to all checkboxes
-      document.querySelectorAll('input[name="topics"]').forEach(checkbox => {
-        checkbox.addEventListener('change', updateProgress);
-      });
-      
-      // Initial progress update
       updateProgress();
-      
-      // Initialize article count display
       const articleCountSlider = document.getElementById('article_count');
       updateArticleCount(articleCountSlider.value);
     });
-
-    // Category Animation on Hover
-    document.querySelectorAll('.topic-category').forEach(category => {
-      category.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-4px)';
-        this.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)';
-      });
-      
-      category.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = '';
-      });
-    });
-
-    // Enhanced touch support for mobile
-    if ('ontouchstart' in window) {
-      document.body.classList.add('touch-device');
-    }
   </script>
 
 </body>

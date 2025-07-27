@@ -1,69 +1,482 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light" class="scroll-smooth">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{ user.name }}'s News Dashboard • AI News Personalizer</title>
-
-  <!-- Tailwind CDN -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
-
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="/static/style.css" />
-
-  <!-- Inter Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Theme Detection -->
-  <script>
-    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'light');
-      document.documentElement.classList.remove('dark');
+  
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
     }
-  </script>
+    
+    .hero-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      background-size: 400% 400%;
+      width: 100vw;
+      min-height: 100vh;
+      animation: gradientShift 8s ease-in-out infinite;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .floating-elements {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .floating-circle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      animation: float 10s ease-in-out infinite;
+    }
+    
+    .floating-circle:nth-child(1) {
+      width: 120px;
+      height: 120px;
+      top: 10%;
+      left: 5%;
+      animation-delay: 0s;
+    }
+    
+    .floating-circle:nth-child(2) {
+      width: 80px;
+      height: 80px;
+      top: 60%;
+      right: 10%;
+      animation-delay: 3s;
+    }
+    
+    .floating-circle:nth-child(3) {
+      width: 100px;
+      height: 100px;
+      top: 80%;
+      left: 15%;
+      animation-delay: 6s;
+    }
+    
+    .floating-circle:nth-child(4) {
+      width: 60px;
+      height: 60px;
+      top: 30%;
+      right: 20%;
+      animation-delay: 9s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-40px) rotate(180deg); }
+    }
+    
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      animation: slideInDown 1s ease-out;
+    }
+    
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .main-content {
+      position: relative;
+      z-index: 10;
+      padding: 2rem 0;
+      animation: fadeInUp 1.2s ease-out 0.3s both;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      animation: cardGlow 4s ease-in-out infinite alternate;
+    }
+    
+    @keyframes cardGlow {
+      0% { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); }
+      100% { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 30px rgba(255, 255, 255, 0.1); }
+    }
+    
+    .news-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: slideInCard 0.8s ease-out both;
+    }
+    
+    .news-card:nth-child(even) {
+      animation-delay: 0.2s;
+    }
+    
+    .news-card:nth-child(odd) {
+      animation-delay: 0.4s;
+    }
+    
+    @keyframes slideInCard {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .news-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    .form-input {
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 0.75rem;
+      padding: 0.875rem 1rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      transform: scale(1.02);
+    }
+    
+    .btn {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      border-radius: 0.75rem;
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: none;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.8);
+      color: #4B5563;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .title-glow {
+      animation: titlePulse 3s ease-in-out infinite alternate;
+    }
+    
+    @keyframes titlePulse {
+      0% { text-shadow: 0 0 10px rgba(102, 126, 234, 0.3); }
+      100% { text-shadow: 0 0 20px rgba(102, 126, 234, 0.6); }
+    }
+    
+    .icon-bounce {
+      display: inline-block;
+      animation: iconBounce 2s ease-in-out infinite;
+    }
+    
+    @keyframes iconBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+    
+    .stats-card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(15px);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+      animation: statsFloat 3s ease-in-out infinite alternate;
+    }
+    
+    .stats-card:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .stats-card-clickable {
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none !important;
+      color: inherit;
+    }
+    
+    .stats-card-clickable:hover {
+      transform: translateY(-8px) scale(1.08);
+      box-shadow: 0 25px 50px rgba(147, 51, 234, 0.3);
+      background: rgba(255, 255, 255, 0.98);
+    }
+    
+    .stats-card-clickable:hover .click-hint span {
+      opacity: 1;
+    }
+    
+    .stats-card-clickable:hover .icon-bounce {
+      animation: iconPulse 0.6s ease-in-out infinite alternate;
+    }
+    
+    @keyframes iconPulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.1); }
+    }
+    
+    .stats-card-clickable:active {
+      transform: translateY(-3px) scale(1.02);
+      transition: all 0.1s ease;
+    }
+    
+    @keyframes statsFloat {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-10px); }
+    }
+    
+    .nav-link {
+      color: #4B5563;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    
+    .nav-link:hover {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+      transform: translateY(-2px);
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientTextShift 3s ease-in-out infinite alternate;
+    }
+    
+    @keyframes gradientTextShift {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(20deg); }
+    }
+    
+    .toast {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      animation: slideInRight 0.3s ease-out;
+    }
+    
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(100px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .toast-success {
+      border-left: 4px solid #10B981;
+      color: #059669;
+    }
+    
+    .toast-error {
+      border-left: 4px solid #EF4444;
+      color: #DC2626;
+    }
+    
+    .loading-skeleton {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      animation: skeletonPulse 2s ease-in-out infinite alternate;
+    }
+    
+    @keyframes skeletonPulse {
+      0% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+    
+    .skeleton-shimmer {
+      background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+      background-size: 200% 100%;
+      animation: shimmer 2s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    
+    .scroll-to-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      cursor: pointer;
+    }
+    
+    .scroll-to-top.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    .scroll-to-top:hover {
+      transform: translateY(-5px) scale(1.1);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+    
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      z-index: 1000;
+      transition: width 0.1s ease;
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .floating-circle {
+        display: none;
+      }
+      
+      .main-content {
+        padding: 1rem 0;
+      }
+      
+      .card {
+        margin: 0 1rem 2rem 1rem;
+        padding: 1.5rem;
+      }
+      
+      .stats-card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
 </head>
 
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen font-sans transition-colors duration-300">
+<body class="hero-bg">
+  <!-- Floating background elements -->
+  <div class="floating-elements">
+    <div class="floating-circle"></div>
+    <div class="floating-circle"></div>
+    <div class="floating-circle"></div>
+    <div class="floating-circle"></div>
+  </div>
 
-  <!-- Modern Navbar -->
-  <header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 fixed top-0 inset-x-0 z-50 transition-all duration-300 safe-area-inset-top">
-    <div class="container-responsive">
+  <!-- Header -->
+  <header class="header">
+    <div class="max-w-6xl mx-auto px-4 py-4">
       <div class="flex items-center justify-between h-16">
         
         <!-- Logo and Welcome -->
         <div class="flex items-center space-x-4">
-          <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
-            </svg>
+          <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center icon-bounce">
+            <span class="text-xl">🤖</span>
           </div>
           <div class="hidden md:block">
-            <h1 class="text-lg font-semibold text-gray-900 dark:text-white">Welcome back, {{ user.name.split()[0] }}!</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Your personalized news dashboard</p>
+            <h1 class="text-xl font-bold text-gray-800 title-glow">
+              <span class="icon-bounce">👋</span> Welcome back, {{ user.name.split()[0] }}!
+            </h1>
+            <p class="text-sm text-gray-600">Your personalized news dashboard</p>
           </div>
         </div>
 
-        <!-- Search Bar -->
-        <div class="hidden md:flex flex-1 max-w-lg mx-8">
-          <div class="relative w-full">
-            <input 
-              type="text" 
-              placeholder="Search news..." 
-              id="searchInput"
-              class="form-input pl-10 pr-4 py-2 w-full text-sm"
-            />
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-          </div>
-        </div>
 
         <!-- Navigation -->
         <div class="flex items-center space-x-2 md:space-x-4">
@@ -78,15 +491,6 @@
             </svg>
           </button>
           
-          <!-- Theme Toggle -->
-          <button id="themeToggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors touch-target">
-            <svg id="lightIcon" class="w-5 h-5 text-gray-500 dark:text-gray-400 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            <svg id="darkIcon" class="w-5 h-5 text-gray-500 dark:text-gray-400 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            </svg>
-          </button>
 
           <!-- Desktop User Menu -->
           <div class="hidden md:block relative">
@@ -144,22 +548,7 @@
   
   <!-- Mobile Navigation Menu -->
   <div id="mobileNavMenu" class="md:hidden fixed top-16 inset-x-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-lg hidden safe-area-inset-left safe-area-inset-right">
-    <!-- Mobile Search -->
     <div class="container-responsive py-4">
-      <div class="relative mb-4">
-        <input 
-          type="text" 
-          placeholder="Search news..." 
-          id="mobileSearchInput"
-          class="form-input pl-10 pr-4 py-3 w-full"
-        />
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
-      </div>
-    
       <!-- Mobile Navigation Links -->
       <div class="space-y-2">
         <a href="/profile/edit" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors touch-target">
@@ -193,22 +582,19 @@
   </div>
 
   <!-- Main Content -->
-  <main class="pt-20 pb-8 safe-area-inset-bottom">
+  <main class="main-content pt-20 pb-8">
     
     <!-- Preferences Section -->
-    <section class="container-responsive mt-6">
+    <section class="max-w-6xl mx-auto px-4 mt-6">
       <div class="card p-6 mb-8 news-card">
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-green-400 to-blue-500 flex items-center justify-center">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+            <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-green-400 to-blue-500 flex items-center justify-center icon-bounce">
+              <span class="text-xl">⚙️</span>
             </div>
             <div>
-              <h2 class="text-xl font-bold text-gray-900 dark:text-white">Your Preferences</h2>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Personalized news topics</p>
+              <h2 class="text-xl font-bold text-gray-800 title-glow">Your Preferences</h2>
+              <p class="text-sm text-gray-600">Personalized news topics</p>
             </div>
           </div>
           <a href="/profile" class="btn btn-secondary text-sm interactive">
@@ -244,55 +630,53 @@
     </section>
 
     <!-- Quick Stats -->
-    <section class="container-responsive mb-8">
-      <div class="grid-responsive">
-        <div class="card p-6 text-center">
-          <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-            </svg>
+    <section class="max-w-6xl mx-auto px-4 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="stats-card">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center icon-bounce">
+            <span class="text-2xl">📰</span>
           </div>
-          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ summaries|length if summaries else 0 }}</h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Articles Today</p>
+          <h3 class="text-3xl font-bold text-gray-800 mb-2 gradient-text">{{ summaries|length if summaries else 0 }}</h3>
+          <p class="text-gray-600">Articles Today</p>
         </div>
-        <div class="card p-6 text-center">
-          <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
+        <a href="/favorites" class="stats-card stats-card-clickable block text-decoration-none">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center icon-bounce">
+            <span class="text-2xl">💖</span>
           </div>
-          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">{{ favorites_count if favorites_count else 0 }}</h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Saved Articles</p>
-        </div>
-        <div class="card p-6 text-center">
-          <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
+          <h3 class="text-3xl font-bold text-gray-800 mb-2 gradient-text">{{ favorites_count if favorites_count else 0 }}</h3>
+          <p class="text-gray-600">Saved Articles</p>
+          <div class="click-hint">
+            <span class="text-xs text-gray-500 mt-2 opacity-0 transition-opacity duration-300">Click to view →</span>
           </div>
-          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">AI</h3>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Powered</p>
+        </a>
+        <div class="stats-card">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center icon-bounce">
+            <span class="text-2xl">🤖</span>
+          </div>
+          <h3 class="text-3xl font-bold text-gray-800 mb-2 gradient-text">AI</h3>
+          <p class="text-gray-600">Powered</p>
         </div>
       </div>
     </section>
 
     <!-- Loading Skeleton -->
-    <div id="loadingSkeleton" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Loading Your News...</h2>
-        <div class="spinner"></div>
+    <div id="loadingSkeleton" class="max-w-6xl mx-auto px-4">
+      <div class="text-center mb-8">
+        <div class="text-6xl mb-4 icon-bounce">🔄</div>
+        <h2 class="text-2xl font-bold text-gray-800 title-glow">Loading Your News...</h2>
+        <p class="text-gray-600 mt-2">AI is curating personalized articles for you</p>
       </div>
       <div class="grid gap-6">
         {% for _ in range(3) %}
-          <div class="card p-6 animate-pulse">
+          <div class="loading-skeleton">
             <div class="flex items-start space-x-4">
-              <div class="skeleton skeleton-dark w-20 h-20 rounded-lg flex-shrink-0"></div>
+              <div class="w-20 h-20 rounded-lg bg-gray-200 skeleton-shimmer flex-shrink-0"></div>
               <div class="flex-1 space-y-3">
-                <div class="skeleton skeleton-dark h-4 w-3/4 rounded"></div>
-                <div class="skeleton skeleton-dark h-3 w-1/2 rounded"></div>
+                <div class="h-4 w-3/4 rounded bg-gray-200 skeleton-shimmer"></div>
+                <div class="h-3 w-1/2 rounded bg-gray-200 skeleton-shimmer"></div>
                 <div class="space-y-2">
-                  <div class="skeleton skeleton-dark h-3 w-full rounded"></div>
-                  <div class="skeleton skeleton-dark h-3 w-5/6 rounded"></div>
+                  <div class="h-3 w-full rounded bg-gray-200 skeleton-shimmer"></div>
+                  <div class="h-3 w-5/6 rounded bg-gray-200 skeleton-shimmer"></div>
                 </div>
               </div>
             </div>
@@ -302,30 +686,19 @@
     </div>
 
     <!-- News Articles -->
-    <section id="articleContainer" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 hidden">
+    <section id="articleContainer" class="max-w-6xl mx-auto px-4 hidden">
       
       <!-- Section Header -->
+      <div class="card text-center mb-8">
+        <div class="text-6xl mb-4 icon-bounce">📱</div>
+        <h2 class="text-3xl font-bold text-gray-800 mb-3 title-glow">Your Personalized News</h2>
+        <p class="text-gray-600 text-lg">Latest articles tailored to your interests</p>
+      </div>
+      
       <div class="flex items-center justify-between mb-8">
         <div>
-          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Your Personalized News</h2>
-          <p class="text-gray-500 dark:text-gray-400 mt-1">Latest articles tailored to your interests</p>
-        </div>
-        
-        <!-- Filter Options -->
-        <div class="flex items-center space-x-3">
-          <select id="categoryFilter" class="form-input text-sm py-2">
-            <option value="">All Categories</option>
-            <option value="technology">Technology</option>
-            <option value="business">Business</option>
-            <option value="sports">Sports</option>
-            <option value="health">Health</option>
-          </select>
-          <button id="refreshNews" class="btn btn-secondary text-sm interactive">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            Refresh
-          </button>
+          <h3 class="text-xl font-bold text-gray-800">Today's Articles</h3>
+          <p class="text-gray-600 mt-1">Curated just for you</p>
         </div>
       </div>
 
@@ -412,21 +785,14 @@
           {% endfor %}
         {% else %}
           <!-- Empty State -->
-          <div class="text-center py-16">
-            <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 flex items-center justify-center">
-              <svg class="w-12 h-12 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-              </svg>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Articles Found</h3>
-            <p class="text-gray-500 dark:text-gray-400 mb-6">
+          <div class="card text-center py-16">
+            <div class="text-8xl mb-6 icon-bounce">📭</div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4 title-glow">No Articles Found</h3>
+            <p class="text-gray-600 mb-8 max-w-md mx-auto text-lg">
               We couldn't find any articles matching your preferences. Try updating your topics or check back later.
             </p>
             <a href="/profile" class="btn btn-primary">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+              <span class="icon-bounce">⚙️</span>
               Update Preferences
             </a>
           </div>
@@ -437,47 +803,18 @@
   </main>
 
   <!-- Toast Container -->
-  <div id="toast-container" class="fixed top-20 right-4 z-40 space-y-2"></div>
+  <div id="toast-container" class="fixed top-20 right-4 z-50 space-y-2"></div>
 
   <!-- Scroll Progress Bar -->
   <div id="scrollProgress" class="scroll-progress"></div>
 
-  <!-- Floating Scroll Actions -->
-  <div class="floating-scroll-actions">
-    <!-- Scroll to Top Button -->
-    <button id="scrollToTop" class="scroll-to-top" aria-label="Scroll to top" title="Back to top">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-      </svg>
-    </button>
-  </div>
+  <!-- Scroll to Top Button -->
+  <button id="scrollToTop" class="scroll-to-top" aria-label="Scroll to top" title="Back to top">
+    <span class="text-xl">⬆️</span>
+  </button>
 
   <!-- JavaScript -->
   <script>
-    // Theme Toggle Functionality
-    const themeToggle = document.getElementById('themeToggle');
-    const lightIcon = document.getElementById('lightIcon');
-    const darkIcon = document.getElementById('darkIcon');
-
-    themeToggle.addEventListener('click', function() {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      
-      document.documentElement.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      
-      if (newTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-        lightIcon.classList.remove('hidden');
-        darkIcon.classList.add('hidden');
-      } else {
-        document.documentElement.classList.remove('dark');
-        lightIcon.classList.add('hidden');
-        darkIcon.classList.remove('hidden');
-      }
-      
-      showToast('Theme updated to ' + newTheme + ' mode', 'info');
-    });
 
     // User Menu Toggle
     const userMenuToggle = document.getElementById('userMenuToggle');
@@ -493,41 +830,6 @@
       userMenu.classList.add('hidden');
     });
 
-    // Enhanced Search Functionality (Desktop + Mobile)
-    function handleSearch(searchTerm) {
-      const articles = document.querySelectorAll('#articlesGrid article');
-      
-      articles.forEach(article => {
-        const title = article.querySelector('h3').textContent.toLowerCase();
-        const summary = article.querySelector('p').textContent.toLowerCase();
-        
-        if (title.includes(searchTerm) || summary.includes(searchTerm)) {
-          article.style.display = 'block';
-        } else {
-          article.style.display = searchTerm ? 'none' : 'block';
-        }
-      });
-    }
-    
-    // Desktop search
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-      searchInput.addEventListener('input', function(e) {
-        handleSearch(e.target.value.toLowerCase());
-      });
-    }
-    
-    // Mobile search
-    const mobileSearchInput = document.getElementById('mobileSearchInput');
-    if (mobileSearchInput) {
-      mobileSearchInput.addEventListener('input', function(e) {
-        handleSearch(e.target.value.toLowerCase());
-        // Sync with desktop search if present
-        if (searchInput) {
-          searchInput.value = e.target.value;
-        }
-      });
-    }
 
     // Share Article Function
     function shareArticle(title, url) {

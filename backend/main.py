@@ -6,7 +6,8 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from pathlib import Path
 import os
 
-from backend.routers import auth, users, profile, preferences, news , favorites
+from backend.routers import auth, users, profile, preferences, news, favorites
+from backend.db.mongo import db
 
 app = FastAPI()
 
@@ -26,6 +27,15 @@ app.include_router(profile.router)
 app.include_router(preferences.router)
 app.include_router(news.router)
 app.include_router(favorites.router)
+
+# Admin route to clear users
+@app.delete("/clear-users")
+async def clear_all_users():
+    try:
+        result = await db["users"].delete_many({})
+        return {"message": f"Deleted {result.deleted_count} users"}
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/loading", response_class=HTMLResponse)
 async def loading(request: Request, article_count: int = 10, topics: str = ""):

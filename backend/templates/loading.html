@@ -1,50 +1,297 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light" class="smooth-scroll">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Loading Your News… • AI News Personalizer</title>
-  
-  <!-- Tailwind CSS -->
+  <title>Loading Your News - AI News Personalizer</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
   
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="/static/style.css" />
-  
-  <!-- Inter Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Theme Detection -->
-  <script>
-    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.setAttribute('data-theme', 'light');
-      document.documentElement.classList.remove('dark');
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
     }
-  </script>
+    
+    .hero-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      background-size: 400% 400%;
+      width: 100vw;
+      min-height: 100vh;
+      animation: gradientShift 8s ease-in-out infinite;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .floating-elements {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
+    .floating-circle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      animation: float 8s ease-in-out infinite;
+    }
+    
+    .floating-circle:nth-child(1) {
+      width: 120px;
+      height: 120px;
+      top: 15%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+    
+    .floating-circle:nth-child(2) {
+      width: 80px;
+      height: 80px;
+      top: 70%;
+      right: 15%;
+      animation-delay: 2s;
+    }
+    
+    .floating-circle:nth-child(3) {
+      width: 60px;
+      height: 60px;
+      top: 40%;
+      left: 75%;
+      animation-delay: 4s;
+    }
+    
+    .floating-circle:nth-child(4) {
+      width: 100px;
+      height: 100px;
+      top: 80%;
+      left: 20%;
+      animation-delay: 6s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-40px) rotate(180deg); }
+    }
+    
+    .loading-container {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      animation: fadeInUp 1s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-radius: 2rem;
+      padding: 3rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      animation: cardGlow 4s ease-in-out infinite alternate;
+      max-width: 500px;
+      margin: 2rem;
+    }
+    
+    @keyframes cardGlow {
+      0% { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+      100% { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.2); }
+    }
+    
+    .title-glow {
+      animation: titlePulse 3s ease-in-out infinite alternate;
+    }
+    
+    @keyframes titlePulse {
+      0% { text-shadow: 0 0 20px rgba(102, 126, 234, 0.5); }
+      100% { text-shadow: 0 0 40px rgba(102, 126, 234, 0.8); }
+    }
+    
+    .loading-icon {
+      display: inline-block;
+      animation: loadingSpin 2s linear infinite;
+      font-size: 4rem;
+      margin-bottom: 2rem;
+    }
+    
+    @keyframes loadingSpin {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.1); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(102, 126, 234, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 2rem 0;
+      position: relative;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 10px;
+      transition: width 0.5s ease;
+      animation: progressPulse 2s ease-in-out infinite alternate;
+      position: relative;
+    }
+    
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      animation: progressShine 2s linear infinite;
+    }
+    
+    @keyframes progressPulse {
+      0% { box-shadow: 0 0 5px rgba(102, 126, 234, 0.3); }
+      100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.6); }
+    }
+    
+    @keyframes progressShine {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    .loading-message {
+      color: #4B5563;
+      font-size: 1.125rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      animation: messageGlow 3s ease-in-out infinite alternate;
+    }
+    
+    @keyframes messageGlow {
+      0% { opacity: 0.8; }
+      100% { opacity: 1; }
+    }
+    
+    .progress-text {
+      color: #667eea;
+      font-weight: 700;
+      font-size: 1.5rem;
+      margin-top: 1rem;
+      animation: numberGlow 2s ease-in-out infinite alternate;
+    }
+    
+    @keyframes numberGlow {
+      0% { text-shadow: 0 0 10px rgba(102, 126, 234, 0.5); }
+      100% { text-shadow: 0 0 20px rgba(102, 126, 234, 0.8); }
+    }
+    
+    .feature-dots {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .feature-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      animation: dotPulse 2s ease-in-out infinite;
+    }
+    
+    .feature-dot:nth-child(1) {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      animation-delay: 0s;
+    }
+    
+    .feature-dot:nth-child(2) {
+      background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+      animation-delay: 0.5s;
+    }
+    
+    .feature-dot:nth-child(3) {
+      background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+      animation-delay: 1s;
+    }
+    
+    @keyframes dotPulse {
+      0%, 100% { 
+        transform: scale(1);
+        opacity: 0.7;
+      }
+      50% { 
+        transform: scale(1.3);
+        opacity: 1;
+        box-shadow: 0 0 15px rgba(102, 126, 234, 0.6);
+      }
+    }
+    
+    .tip-text {
+      color: #6B7280;
+      font-size: 0.875rem;
+      margin-top: 1.5rem;
+      animation: fadeInDelay 2s ease-out;
+    }
+    
+    @keyframes fadeInDelay {
+      0% { opacity: 0; }
+      60% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .floating-circle {
+        display: none;
+      }
+      
+      .card {
+        margin: 1rem;
+        padding: 2rem;
+      }
+      
+      .loading-icon {
+        font-size: 3rem;
+      }
+    }
+  </style>
 
   <!-- Loading Logic -->
   <script>
-    // Enhanced loading with dynamic progress tracking
     let progress = 0;
     
-    // Get loading parameters from backend
-    const estimatedTime = {{ estimated_time|default(6000) }};
-    const articleCount = {{ article_count|default(10) }};
-    const topicCount = {{ topic_count|default(1) }};
-    
-    // Dynamic loading messages based on content
-    let loadingMessages = [
-      "Analyzing your preferences...",
-      `Fetching ${articleCount} latest news articles...`, 
-      "AI is personalizing your feed...",
-      `Processing ${topicCount} topic${topicCount !== 1 ? 's' : ''}...`,
-      "Organizing articles by relevance...",
-      "Almost ready, finalizing your dashboard..."
+    const loadingMessages = [
+      "🔍 Analyzing your preferences...",
+      "📰 Fetching latest news articles...", 
+      "🤖 AI is personalizing your feed...",
+      "📊 Processing your topics...",
+      "⚡ Organizing articles by relevance...",
+      "✨ Almost ready, finalizing your dashboard..."
     ];
     let currentMessageIndex = 0;
     
@@ -54,235 +301,101 @@
       const progressText = document.getElementById('progressText');
       
       if (progressBar && loadingMessage && progressText) {
-        // Calculate dynamic progress increment based on estimated time
-        const baseIncrement = 100 / (estimatedTime / 800); // Target completion in estimatedTime
-        progress += Math.random() * baseIncrement * 0.5 + baseIncrement * 0.5;
+        progress += (Math.random() * 8 + 4) / 1.5;
         
         if (progress > 100) progress = 100;
         
         progressBar.style.width = progress + '%';
         progressText.textContent = Math.round(progress) + '%';
         
-        // Update message based on progress (dynamic message count)
-        const messageThreshold = 100 / loadingMessages.length;
-        const expectedMessageIndex = Math.floor(progress / messageThreshold);
-        
-        if (expectedMessageIndex < loadingMessages.length && expectedMessageIndex > currentMessageIndex) {
-          currentMessageIndex = expectedMessageIndex;
+        const messageIndex = Math.floor((progress / 100) * loadingMessages.length);
+        if (messageIndex < loadingMessages.length && messageIndex > currentMessageIndex) {
+          currentMessageIndex = messageIndex;
           loadingMessage.textContent = loadingMessages[currentMessageIndex];
         }
         
         if (progress >= 100) {
           setTimeout(() => {
             window.location.href = "/dashboard";
-          }, 500);
+          }, 800);
         }
       }
     }
     
-    // Start progress simulation after page loads
     window.addEventListener('DOMContentLoaded', function() {
-      // Initialize first message
       const loadingMessage = document.getElementById('loadingMessage');
       if (loadingMessage) {
         loadingMessage.textContent = loadingMessages[0];
       }
       
-      // Dynamic update interval based on estimated time
-      const updateInterval = Math.max(300, estimatedTime / 15); // 15 updates over estimated time, minimum 300ms
       const progressInterval = setInterval(() => {
         updateProgress();
         if (progress >= 100) {
           clearInterval(progressInterval);
         }
-      }, updateInterval);
+      }, 900);
       
-      // Backup redirect after estimated time + 3 seconds buffer
       setTimeout(() => {
         if (progress < 100) {
           window.location.href = "/dashboard";
         }
-      }, estimatedTime + 3000);
+      }, 18000);
     });
   </script>
 </head>
 
-<body class="hero-gradient min-h-screen flex items-center justify-center font-sans transition-colors duration-300 safe-area-inset-top safe-area-inset-bottom relative overflow-hidden">
+<body class="hero-bg">
+  <!-- Floating background elements -->
+  <div class="floating-elements">
+    <div class="floating-circle"></div>
+    <div class="floating-circle"></div>
+    <div class="floating-circle"></div>
+    <div class="floating-circle"></div>
+  </div>
   
-  <!-- Animated Background Pattern -->
-  <div class="absolute inset-0 opacity-10">
-    <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 1px, transparent 0); background-size: 40px 40px; animation: backgroundFloat 20s linear infinite;"></div>
-  </div>
-
-  <!-- Floating Elements -->
-  <div class="absolute inset-0 overflow-hidden pointer-events-none">
-    <div class="floating-element" style="top: 20%; left: 10%; animation-delay: 0s;">
-      <div class="w-4 h-4 bg-white/20 rounded-full"></div>
-    </div>
-    <div class="floating-element" style="top: 60%; left: 80%; animation-delay: 1s;">
-      <div class="w-6 h-6 bg-white/15 rounded-full"></div>
-    </div>
-    <div class="floating-element" style="top: 30%; left: 70%; animation-delay: 2s;">
-      <div class="w-3 h-3 bg-white/25 rounded-full"></div>
-    </div>
-    <div class="floating-element" style="top: 80%; left: 20%; animation-delay: 0.5s;">
-      <div class="w-5 h-5 bg-white/20 rounded-full"></div>
-    </div>
-  </div>
-
-  <!-- Main Loading Content -->
-  <div class="relative z-10 w-full max-w-2xl mx-4">
-    
-    <!-- Logo and Header -->
-    <div class="text-center mb-12 animate-fade-in">
-      <div class="w-20 h-20 mx-auto mb-6 rounded-3xl bg-white/20 backdrop-blur flex items-center justify-center animate-pulse">
-        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364-.636l-.707.707M21 12h-1M17.657 17.657l-.707-.707M12 21v-1m-6.364-.636l.707-.707M3 12h1m3.343-5.657l.707.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-        </svg>
-      </div>
+  <!-- Loading Container -->
+  <div class="loading-container">
+    <div class="card">
       
-      <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 animate-fade-in" style="animation-delay: 0.2s;">
+      <!-- Logo Icon -->
+      <div class="loading-icon">🤖</div>
+      
+      <!-- Title -->
+      <h1 class="text-3xl font-bold text-gray-800 mb-2 title-glow">
         AI News Personalizer
       </h1>
       
-      <p class="text-xl md:text-2xl text-white/90 mb-2 animate-fade-in" style="animation-delay: 0.4s;">
+      <p class="text-gray-600 mb-4">
         Curating your personalized news feed
       </p>
-    </div>
-
-    <!-- Loading Progress -->
-    <div class="card backdrop-blur bg-white/10 p-8 mb-8 animate-fade-in" style="animation-delay: 0.6s;">
-      <div class="text-center mb-6">
-        <div id="loadingMessage" class="text-lg font-medium text-white mb-4 min-h-[1.5rem]">
-          Initializing...
-        </div>
-        
-        <!-- Progress Bar -->
-        <div class="w-full bg-white/20 rounded-full h-3 mb-4 overflow-hidden">
-          <div id="progressBar" class="bg-gradient-to-r from-green-400 to-blue-400 h-3 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
-        </div>
-        
-        <div class="flex justify-between items-center text-sm text-white/80">
-          <span>Progress</span>
-          <span id="progressText">0%</span>
-        </div>
+      
+      <!-- Loading Message -->
+      <div id="loadingMessage" class="loading-message">
+        Initializing...
       </div>
       
-      <!-- Animated AI Icon -->
-      <div class="flex justify-center">
-        <div class="relative">
-          <div class="w-16 h-16 bg-gradient-to-r from-blue-400 to-purple-500 rounded-2xl flex items-center justify-center animate-pulse">
-            <svg class="w-8 h-8 text-white animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364-.636l-.707.707M21 12h-1M17.657 17.657l-.707-.707M12 21v-1m-6.364-.636l.707-.707M3 12h1m3.343-5.657l.707.707" />
-            </svg>
-          </div>
-          <!-- Pulsing rings -->
-          <div class="absolute inset-0 rounded-2xl border border-white/30 animate-ping"></div>
-          <div class="absolute inset-0 rounded-2xl border border-white/20 animate-ping" style="animation-delay: 0.5s;"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Feature Highlights -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-      <div class="card backdrop-blur bg-white/10 p-6 text-center text-white animate-fade-in" style="animation-delay: 0.8s;">
-        <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-r from-green-400 to-emerald-500 flex items-center justify-center">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        </div>
-        <h3 class="font-semibold mb-2">Smart Personalization</h3>
-        <p class="text-sm text-white/80">AI learns your preferences to deliver the most relevant news</p>
+      <!-- Progress Bar -->
+      <div class="progress-bar">
+        <div id="progressBar" class="progress-fill" style="width: 0%"></div>
       </div>
       
-      <div class="card backdrop-blur bg-white/10 p-6 text-center text-white animate-fade-in" style="animation-delay: 1.0s;">
-        <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-r from-blue-400 to-cyan-500 flex items-center justify-center">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
-        </div>
-        <h3 class="font-semibold mb-2">Save Favorites</h3>
-        <p class="text-sm text-white/80">Bookmark articles you love for easy access later</p>
+      <!-- Progress Text -->
+      <div id="progressText" class="progress-text">0%</div>
+      
+      <!-- Feature Dots -->
+      <div class="feature-dots">
+        <div class="feature-dot"></div>
+        <div class="feature-dot"></div>
+        <div class="feature-dot"></div>
       </div>
       
-      <div class="card backdrop-blur bg-white/10 p-6 text-center text-white animate-fade-in" style="animation-delay: 1.2s;">
-        <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-        </div>
-        <h3 class="font-semibold mb-2">Lightning Fast</h3>
-        <p class="text-sm text-white/80">Get your personalized feed in seconds, not minutes</p>
+      <!-- Tip Text -->
+      <div class="tip-text">
+        💡 <strong>Pro Tip:</strong> Customize your preferences anytime from your dashboard
       </div>
-    </div>
-
-    <!-- Loading Tips -->
-    <div class="text-center text-white/80 animate c-fade-in" style="animation-delay: 1.3s;">
-      <p class="text-sm mb-4">💡 <strong>Pro Tip:</strong> Customize your preferences anytime from your dashboard</p>
-      <div class="flex items-center justify-center space-x-4 text-xs">
-        <span class="flex items-center">
-          <div class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
-          Secure
-        </span>
-        <span class="flex items-center">
-          <div class="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
-          Fast
-        </span>
-        <span class="flex items-center">
-          <div class="w-2 h-2 bg-purple-400 rounded-full mr-2 animate-pulse"></div>
-          Personalized
-        </span>
-      </div>
+      
     </div>
   </div>
 
-  <!-- Custom Styles -->
-  <style>
-    @keyframes backgroundFloat {
-      0% { transform: translate(0, 0); }
-      25% { transform: translate(-10px, -10px); }
-      50% { transform: translate(10px, -5px); }
-      75% { transform: translate(-5px, 10px); }
-      100% { transform: translate(0, 0); }
-    }
-    
-    .floating-element {
-      position: absolute;
-      animation: float 6s ease-in-out infinite;
-    }
-    
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      25% { transform: translateY(-20px) rotate(90deg); }
-      50% { transform: translateY(-10px) rotate(180deg); }
-      75% { transform: translateY(-15px) rotate(270deg); }
-    }
-    
-    .animate-fade-in {
-      animation: fadeInUp 0.8s ease-out forwards;
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    
-    @keyframes fadeInUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    /* Responsive adjustments */
-    @media (max-width: 640px) {
-      .hero-gradient {
-        background-attachment: scroll; /* Fix for iOS */
-      }
-      
-      .card {
-        margin: 0.5rem;
-        padding: 1.5rem;
-      }
-    }
-  </style>
 </body>
 </html>

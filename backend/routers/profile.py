@@ -8,6 +8,7 @@ from backend.db.mongo import db
 from backend.models.user import user_helper
 from datetime import datetime
 from pathlib import Path
+from bson import ObjectId
 from typing import List, Annotated
 import requests
 import os
@@ -25,6 +26,19 @@ NEWS_API_URL = "https://newsdata.io/api/1/news"
 openai_client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
 def get_openai_summary(text: str, lang: str = "en") -> str:
+    """
+    Generate AI-powered article summary using OpenAI GPT-3.5.
+    
+    Args:
+        text (str): Article content to summarize
+        lang (str): Target language for summary (default: "en")
+        
+    Returns:
+        str: Generated summary or fallback message if processing fails
+        
+    Note:
+        Falls back to standard messages if content is insufficient or API fails
+    """
     if not openai_client:
         return "OpenAI not configured"
     
@@ -55,7 +69,7 @@ def get_openai_summary(text: str, lang: str = "en") -> str:
         )
         summary = response.choices[0].message.content.strip()
         
-        # Filter out unhelpful responses
+        # Filter out unhelpful AI responses
         if "cannot provide" in summary.lower() or "sorry" in summary.lower():
             return "Limited preview available - visit article for full details"
             
@@ -65,13 +79,25 @@ def get_openai_summary(text: str, lang: str = "en") -> str:
         return "Summary unavailable - visit article for full details"
 
 
-# backend/routers/profile.py
 @router.post("/me/preferences")
 async def update_my_preferences(
     preferences: ProfilePreferences,
     current_user: dict = Depends(get_current_user),
 ):
-    # Force English (or drop the field entirely)
+    """
+    Update user preferences via API endpoint.
+    
+    Args:
+        preferences (ProfilePreferences): User preference data
+        current_user (dict): Current authenticated user from dependency injection
+        
+    Returns:
+        dict: Success message with updated preferences
+        
+    Raises:
+        HTTPException: 404 if user not found in database
+    """
+    # Enforce English language setting
     preferences.language = "en"
 
     result = db["users"].update_one(
@@ -82,7 +108,6 @@ async def update_my_preferences(
         raise HTTPException(status_code=404, detail="User not found")
     return {"message": "Preferences updated", "data": preferences}
 
-# backend/routers/profile.py
 @router.post("/profile", response_class=HTMLResponse)
 async def save_preferences(
     request: Request,
@@ -90,7 +115,26 @@ async def save_preferences(
     article_count: Annotated[int, Form(...)] = ...,
     user = Depends(get_current_user),
 ):
-    """Stores topics + article_count; language is hard-coded to 'en'."""
+    """
+    Save user topic preferences and article count from profile form.
+    
+    Args:
+        request (Request): FastAPI request object for template rendering
+        topics (list[str] | None): Selected topic interests from form
+        article_count (int): Number of articles to display per page
+        user (dict): Current authenticated user from dependency injection
+        
+    Returns:
+        RedirectResponse: Redirects to loading page with preferences
+        TemplateResponse: Profile form with error if validation fails
+        
+    Note:
+        Language preference is hardcoded to English ('en')
+    """
+    print(f"[DEBUG] Received topics: {topics}")
+    print(f"[DEBUG] Topics type: {type(topics)}")
+    print(f"[DEBUG] Number of topics: {len(topics) if topics else 0}")
+    
     if not topics:
         return templates.TemplateResponse(
             "profile.html",
@@ -102,37 +146,68 @@ async def save_preferences(
 
     if isinstance(topics, str):
         topics = [topics]
+    
+    print(f"[DEBUG] Final topics to save: {topics}")
+    print(f"[DEBUG] Final topics count: {len(topics)}")
 
-    await db["users"].update_one(
-        {"_id": user["_id"]},
-        {"$set": {
-            "preferences": {
-                "topics": topics,
+    # Handle test user scenario: log preferences without database modification
+    if user["_id"] == "test_user_id":
+        print(f"[TEST USER] Would save topics: {topics}")
+        print(f"[TEST USER] Would save article_count: {article_count}")
+        # Test user data cannot be persisted to database
+    else:
+        await db["users"].update_one(
+            {"_id": ObjectId(user["_id"])},
+            {"$set": {
+                "preferences": {
+                    "topics": topics,
+                    "article_count": article_count,
+                },
+                "preferred_language": "en",
                 "article_count": article_count,
-            },
-            "preferred_language": "en",
-            "article_count": article_count,
-        }},
-    )
+            }},
+        )
 
-    # Build loading URL with parameters based on user preferences
+    # Construct loading page URL with user preference parameters
     topics_str = ",".join(topics) if topics else ""
     loading_url = f"/loading?article_count={article_count}&topics={topics_str}"
     return RedirectResponse(loading_url, status_code=302)
-# backend/routers/profile.py
 @router.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request, user=Depends(get_current_user)):
+    """
+    Display personalized news dashboard with user's preferred articles.
+    
+    Args:
+        request (Request): FastAPI request object for template rendering
+        user (dict): Current authenticated user from dependency injection
+        
+    Returns:
+        TemplateResponse: Rendered dashboard.html with personalized news articles
+        RedirectResponse: Redirects to login/profile if user invalid or no preferences
+        
+    Raises:
+        HTTPException: 500 for dashboard errors, 502 for external API failures
+    """
     try:
         print("[DEBUG] Dashboard function started")
         print(f"[DEBUG] User object: {user}")
 
-        # Check if user has email key
+        # Validate user authentication and required fields
         if not user or "email" not in user:
             print("[ERROR] User object missing or no email")
             return RedirectResponse("/login")
 
-        # Get user document from database
-        user_doc = await db["users"].find_one({"_id": user["_id"]})
+        # Retrieve complete user document from database
+        # Handle test user scenario: use cached user data for development/testing
+        if user["_id"] == "test_user_id":
+            user_doc = user  # Use the test user object directly
+            print("[DEBUG] Using test user data directly")
+        else:
+            try:
+                user_doc = await db["users"].find_one({"_id": ObjectId(user["_id"])})
+            except:
+                user_doc = await db["users"].find_one({"_id": user["_id"]})
+        
         if not user_doc:
             print("[ERROR] User not found in database")
             return RedirectResponse("/login")
@@ -170,12 +245,12 @@ async def dashboard(request: Request, user=Depends(get_current_user)):
         articles = []
         # NewsData.io returns results in 'results' field, not 'articles'
         for a in data.get("results", []):
-            # Get the best available text content
+            # Extract best available content from API response
             title = a.get("title", "")
             description = a.get("description", "")
             content = a.get("content", "")
             
-            # Combine available text, prioritizing description over content for free tier
+            # Combine available text content, prioritizing description over full content
             full_text = ""
             if description and len(description) > 50:
                 full_text = f"{title}. {description}"
@@ -184,9 +259,9 @@ async def dashboard(request: Request, user=Depends(get_current_user)):
             else:
                 full_text = title
                 
-            # Generate summary
+            # Generate AI summary from available content
             try:
-                if len(full_text) > 30:  # Only summarize if we have enough content
+                if len(full_text) > 30:  # Minimum content threshold for AI processing
                     summary = get_openai_summary(full_text)
                 else:
                     summary = "Limited content available - visit link for full article"
