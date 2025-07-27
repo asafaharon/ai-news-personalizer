@@ -424,33 +424,124 @@
   <!-- Header -->
   <header class="header">
     <div class="max-w-6xl mx-auto px-4 py-4">
-      <div class="flex items-center justify-between">
-        <h1 class="text-xl md:text-2xl font-bold text-gray-800 title-glow">
-          <span class="icon-bounce">✏️</span> Edit Profile
-        </h1>
+      <div class="flex items-center justify-between h-16">
         
-        <!-- Desktop Navigation -->
-        <nav class="nav-links flex gap-2 text-sm">
-          <a href="/dashboard" class="nav-link">Dashboard</a>
-          <a href="/profile" class="nav-link">Preferences</a>
-          <a href="/favorites" class="nav-link">Favorites</a>
-          <a href="/logout" class="nav-link text-red-600">Logout</a>
-        </nav>
-        
-        <!-- Mobile Menu -->
-        <div class="mobile-menu">
-          <select onchange="if(this.value) window.location.href=this.value" 
-                  class="bg-white/80 border border-white/30 rounded-lg px-3 py-2 text-sm backdrop-blur-sm">
-            <option value="">Menu</option>
-            <option value="/dashboard">Dashboard</option>
-            <option value="/profile">Preferences</option>
-            <option value="/favorites">Favorites</option>
-            <option value="/logout">Logout</option>
-          </select>
+        <!-- Logo and Welcome -->
+        <div class="flex items-center space-x-4">
+          <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center icon-bounce">
+            <span class="text-xl">✏️</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h1 class="text-lg md:text-xl font-bold text-gray-800 title-glow truncate">
+              <span class="icon-bounce hidden sm:inline">📝</span> Edit Profile
+            </h1>
+            <p class="text-xs md:text-sm text-gray-600 hidden sm:block">Update your account details</p>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex items-center space-x-2 md:space-x-4">
+          
+          <!-- Mobile Menu Button -->
+          <button id="mobileMenuToggle" class="md:hidden p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center touch-manipulation">
+            <svg id="menuIcon" class="w-6 h-6 text-gray-500 dark:text-gray-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="closeIcon" class="w-6 h-6 text-gray-500 dark:text-gray-400 hidden transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          
+          <!-- Desktop User Menu -->
+          <div class="hidden md:block relative">
+            <button id="userMenuToggle" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors touch-target">
+              <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
+                <span class="text-white text-sm font-medium">{{ user.name[0].upper() }}</span>
+              </div>
+              <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            <!-- Dropdown Menu -->
+            <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1">
+              <a href="/dashboard" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z" />
+                  </svg>
+                  <span>Dashboard</span>
+                </div>
+              </a>
+              <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <span>Update Preferences</span>
+                </div>
+              </a>
+              <a href="/favorites" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  <span>Favorites</span>
+                </div>
+              </a>
+              <div class="border-t border-gray-200 dark:border-gray-600 my-1"></div>
+              <a href="/logout" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Sign Out</span>
+                </div>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </header>
+  
+  <!-- Mobile Navigation Menu -->
+  <div id="mobileNavMenu" class="md:hidden fixed top-16 inset-x-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-lg transform -translate-y-full transition-transform duration-300 ease-in-out safe-area-inset-left safe-area-inset-right">
+    <div class="px-4 py-4">
+      <!-- Mobile Navigation Links -->
+      <div class="space-y-2">
+        <a href="/dashboard" class="flex items-center space-x-3 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors min-h-[48px] touch-manipulation">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z" />
+          </svg>
+          <span class="font-medium">Dashboard</span>
+        </a>
+        <a href="/profile" class="flex items-center space-x-3 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors min-h-[48px] touch-manipulation">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span class="font-medium">Update Preferences</span>
+        </a>
+        <a href="/favorites" class="flex items-center space-x-3 p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors min-h-[48px] touch-manipulation">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+          <span class="font-medium">Favorites</span>
+        </a>
+        <div class="border-t border-gray-200 dark:border-gray-600 my-3"></div>
+        <a href="/logout" class="flex items-center space-x-3 p-4 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 transition-colors min-h-[48px] touch-manipulation">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span class="font-medium">Sign Out</span>
+        </a>
+      </div>
+    </div>
+  </div>
 
   <!-- Main Content -->
   <main class="main-content">
@@ -636,6 +727,59 @@
   </main>
 
   <script>
+    // Navigation Menu Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+      const mobileNavMenu = document.getElementById('mobileNavMenu');
+      const userMenuToggle = document.getElementById('userMenuToggle');
+      const userMenu = document.getElementById('userMenu');
+      const menuIcon = document.getElementById('menuIcon');
+      const closeIcon = document.getElementById('closeIcon');
+
+      // Mobile menu toggle
+      if (mobileMenuToggle && mobileNavMenu) {
+        mobileMenuToggle.addEventListener('click', function() {
+          const isOpen = !mobileNavMenu.classList.contains('-translate-y-full');
+          
+          if (isOpen) {
+            mobileNavMenu.classList.add('-translate-y-full');
+            menuIcon.classList.remove('hidden');
+            closeIcon.classList.add('hidden');
+          } else {
+            mobileNavMenu.classList.remove('-translate-y-full');
+            menuIcon.classList.add('hidden');
+            closeIcon.classList.remove('hidden');
+          }
+        });
+      }
+
+      // User menu toggle
+      if (userMenuToggle && userMenu) {
+        userMenuToggle.addEventListener('click', function(e) {
+          e.stopPropagation();
+          userMenu.classList.toggle('hidden');
+        });
+
+        // Close user menu when clicking outside
+        document.addEventListener('click', function(e) {
+          if (!userMenuToggle.contains(e.target) && !userMenu.contains(e.target)) {
+            userMenu.classList.add('hidden');
+          }
+        });
+      }
+
+      // Close mobile menu when clicking outside
+      document.addEventListener('click', function(e) {
+        if (mobileNavMenu && !mobileMenuToggle.contains(e.target) && !mobileNavMenu.contains(e.target)) {
+          if (!mobileNavMenu.classList.contains('-translate-y-full')) {
+            mobileNavMenu.classList.add('-translate-y-full');
+            menuIcon.classList.remove('hidden');
+            closeIcon.classList.add('hidden');
+          }
+        }
+      });
+    });
+
     // Password Toggle Functionality - Current Password
     document.getElementById('toggleCurrentPassword').addEventListener('click', function() {
       const password = document.getElementById('current_password');
